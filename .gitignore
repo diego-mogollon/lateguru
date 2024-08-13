@@ -3,7 +3,8 @@ data/
 .python-version
 .DS_Store
 
-
+# Ignore all CSV
+*csv
 
 
 

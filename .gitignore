@@ -3,6 +3,9 @@ data/
 .python-version
 .DS_Store
 
+# Ignore all CSV
+*csv
+
 
 
 # Byte-compiled / optimized / DLL files
@@ -12,6 +15,7 @@ __pycache__/
 
 # C extensions
 *.so
+
 
 # Distribution / packaging
 .Python
@@ -32,6 +36,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -62,6 +67,7 @@ cover/
 *.mo
 *.pot
 
+
 # Django stuff:
 *.log
 local_settings.py
@@ -71,23 +77,19 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 .webassets-cache
-
 # Scrapy stuff:
 .scrapy
-
 # Sphinx documentation
 docs/_build/
-
 # PyBuilder
 .pybuilder/
 target/
-
 # Jupyter Notebook
 .ipynb_checkpoints
-
 # IPython
 profile_default/
 ipython_config.py
+
 
 # pyenv
 #   For a library or package, you might want to ignore these files since the code is
@@ -120,13 +122,12 @@ ipython_config.py
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
-
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
-
 # SageMath parsed files
 *.sage.py
+
 
 # Environments
 .env
@@ -137,13 +138,12 @@ ENV/
 env.bak/
 venv.bak/
 
+
 # Spyder project settings
 .spyderproject
 .spyproject
-
 # Rope project settings
 .ropeproject
-
 # mkdocs documentation
 /site
 
@@ -154,12 +154,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
 # pytype static type analyzer
 .pytype/
-
 # Cython debug symbols
 cython_debug/
+
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

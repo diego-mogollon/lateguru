@@ -3,7 +3,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 #standard pytthon code for requirements.txt file
-with open('requirements.txt') as f:
+with open('requirement.txt') as f:
     content = f.readlines()
     requirements = [x.strip() for x in content]
 

@@ -2,7 +2,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-#standard pytthon code for requirements.txt file
+#standard pytthon code for requirement.txt file
 with open('requirement.txt') as f:
     content = f.readlines()
     requirements = [x.strip() for x in content]

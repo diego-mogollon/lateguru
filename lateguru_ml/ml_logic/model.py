@@ -3,7 +3,7 @@
 import xgboost as xgb
 
 #Initialise XGBoost
-def initialize_xgboost_model(max_depth=5, n_estimators=100, random_state=42):
+def initialise_xgboost_model(max_depth=5, n_estimators=100, random_state=42):
     model = xgb.XGBClassifier(
         use_label_encoder=False,
         eval_metric='logloss',

@@ -22,9 +22,40 @@ GAR_MEMORY = os.environ.get("GAR_MEMORY")
 LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), "mlops", "data")
 LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), "mlops", "training_outputs")
 
-COLUMN_NAMES_RAW = []
+COLUMN_NAMES_RAW = ['Time', 'Origin', 'Dest', 'Carrier', 'Cancelled', 'CancellationReason',
+       'Delayed', 'DepDelayMinutes', 'CarrierDelay', 'Weather_Delay_Length',
+       'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Temperature',
+       'Feels_Like_Temperature', 'Altimeter_Pressure', 'Sea_Level_Pressure',
+       'Visibility', 'Wind_Speed', 'Wind_Gust', 'Precipitation',
+       'Ice_Accretion_3hr', 'Hour', 'Day_Of_Week', 'Month', 'Weather_Delayed']
 
 DTYPES_RAW = {
+    "Time": "object",
+    "Origin": "object",
+    "Dest": "object",
+    "Carrier": "object",
+    "Cancelled": "boolean",
+    "CancellationReason": "object",
+    "Delayed": "boolean",
+    "DepDelayMinutes": "float64",
+    "CarrierDelay": "float64",
+    "Weather_Delay_Length": "float64",
+    "NASDelay": "float64",
+    "SecurityDelay": "float64",
+    "LateAircraftDelay": "float64",
+    "Temperature": "float64",
+    "Feels_Like_Temperature": "float64",
+    "Altimeter_Pressure": "float64",
+    "Sea_Level_Pressure": "float64",
+    "Visibility": "float64",
+    "Wind_Speed": "float64",
+    "Wind_Gust": "float64",
+    "Precipitation": "float64",
+    "Ice_Accretion_3hr": "float64",
+    "Hour": "float64",
+    "Day_Of_Week": "float64",
+    "Month": "float64",
+    "Weather_Delayed": "boolean"
 }
 
 DTYPES_PROCESSED = np.float32

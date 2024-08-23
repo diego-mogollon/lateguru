@@ -19,6 +19,6 @@ def fit_model(model, X_train, y_train):
     return model
 
 #Predict using trained model
-def predict(model, X_test):
-    y_pred = model.predict(X_test)
+def predict(model, X_pred):
+    y_pred = model.predict(X_pred)
     return y_pred

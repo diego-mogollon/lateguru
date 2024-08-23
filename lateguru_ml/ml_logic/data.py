@@ -3,7 +3,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-#Load preprocessed data from path 
+#Load preprocessed data from path
 def load_preprocessed_data(file_path):
     preprocessed_df = pd.read_csv(file_path)
     return preprocessed_df
@@ -34,5 +34,11 @@ def get_features():
                         'SecurityDelay', 'LateAircraftDelay', 'Temperature', 'Feels_Like_Temperature',
                         'Altimeter_Pressure', 'Sea_Level_Pressure', 'Visibility', 'Wind_Speed',
                         'Wind_Gust', 'Precipitation', 'Ice_Accretion_3hr', 'Hour', 'Day_Of_Week', 'Month']
-    
+
     return categorical_features, binary_features, numeric_features
+
+#load airport geolocation data
+
+def load_airport_geo_data(filepath):
+   df =  pd.read_csv(filepath)
+   return df

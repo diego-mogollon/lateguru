@@ -12,8 +12,17 @@ def load_preprocessed_data(file_path):
 
 #Define X and y
 def define_y_and_X(preprocessed_df):
+    # Define X and y
     X = preprocessed_df.drop(columns=['Weather_Delay_Length', 'Weather_Delayed'])
     y = preprocessed_df['Weather_Delayed']
+    
+    # Scale down data types for 'int' and 'float' columns
+    for col in X.select_dtypes(include=['int']).columns:
+        X[col] = X[col].astype('int32')
+
+    for col in X.select_dtypes(include=['float']).columns:
+        X[col] = X[col].astype('float32')
+
     return X, y
 
 #Define Split_train_test

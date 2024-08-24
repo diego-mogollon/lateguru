@@ -1,69 +1,53 @@
-#This file focuses on scaling, feature concatenation, and PCA.
+#This file manages all data-related tasks, such as loading, splitting, and feature retrieval.
 
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import OneHotEncoder
-from scipy.sparse import hstack, csr_matrix
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
-#Scale numeric features
-def scale_numeric_features(X_train, X_test, numeric_features):
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train[numeric_features])
-    X_test_scaled = scaler.transform(X_test[numeric_features])
+#Load preprocessed data from path
+def load_preprocessed_data(file_path):
+    preprocessed_df = pd.read_csv(file_path)
+    return preprocessed_df
 
-    return X_train_scaled, X_test_scaled
+#Load data from gcp (PENDING)
 
-#Combine categorical, scaled numeric, and binary features into single array
-def concatenate_features(X_train_encoded, X_train_scaled, X_train_binary, X_test_encoded, X_test_scaled, X_test_binary):
+#Define X and y
+def define_y_and_X(preprocessed_df):
+    # Define X and y
+    X = preprocessed_df.drop(columns=['Weather_Delay_Length', 'Weather_Delayed'])
+    y = preprocessed_df['Weather_Delayed']
     
-    X_train_scaled_sparse = csr_matrix(X_train_scaled)
-    X_train_binary_sparse = csr_matrix(X_train_binary)
-    
-    X_test_scaled_sparse = csr_matrix(X_test_scaled)
-    X_test_binary_sparse = csr_matrix(X_test_binary)
-    
-    X_train_preprocessed = hstack([csr_matrix(X_train_encoded), X_train_scaled_sparse, X_train_binary_sparse])
-    X_test_preprocessed = hstack([csr_matrix(X_test_encoded), X_test_scaled_sparse, X_test_binary_sparse])
-    
-    return X_train_preprocessed, X_test_preprocessed
+    # Scale down data types for 'int' and 'float' columns
+    for col in X.select_dtypes(include=['int']).columns:
+        X[col] = X[col].astype('int32')
 
-#Apply PCA to scaled numeric features
-def apply_pca(X_train_scaled, X_test_scaled, n_components=10):
-    pca = PCA(n_components=n_components)
-    X_train_pca = pca.fit_transform(X_train_scaled)    
-    X_test_pca = pca.transform(X_test_scaled)   
+    for col in X.select_dtypes(include=['float']).columns:
+        X[col] = X[col].astype('float32')
 
-    return X_train_pca, X_test_pca
+    return X, y
 
-def preprocess_features(df):
+#Define Split_train_test
+def split_train_test(X, y, test_size=0.2, random_state=42):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
+    return X_train, X_test, y_train, y_test
 
-    #instantiating a standard scaler
-    scaler = StandardScaler()
-    #instantiating a PCA function with 10 principal components
-    pca = PCA(n_components=10)
-    #instantiating a OneHotEncoder, check on sparse output
-    ohe = OneHotEncoder(sparse_output=False, drop='if_binary')
+#Define Sampling method to reduce data size
+def sample_down(X, y, sample_size=0.01, random_state=42):
+    X_sample, _, y_sample, _ = train_test_split(X, y, test_size=1-sample_size, random_state=random_state, stratify=y)
+    return X_sample, y_sample
 
-    #Defining subsets of X features based on data type
-    X_num = df.select_dtypes(include='number')
-    X_cat = df.select_dtypes(include='object')
-    X_binary = df.select_dtypes(include='bool')
+#Define categorical, binary, numeric features
+def get_features():
+    categorical_features = ['CancellationReason', 'Origin', 'Dest', 'Carrier']
+    binary_features = ['Cancelled', 'Delayed']
+    numeric_features = ['DepDelayMinutes', 'CarrierDelay', 'NASDelay',
+                        'SecurityDelay', 'LateAircraftDelay', 'Temperature', 'Feels_Like_Temperature',
+                        'Altimeter_Pressure', 'Sea_Level_Pressure', 'Visibility', 'Wind_Speed',
+                        'Wind_Gust', 'Precipitation', 'Ice_Accretion_3hr', 'Hour', 'Day_Of_Week', 'Month']
 
-    #scaling numerical features and encoding categorical features
-    X_num_scaled = scaler.transform(X_num)
-    X_cat_encoded = ohe.transform(X_cat)
-    
-    # Convert to sparse matrices
-    X_num_scaled_sparse = csr_matrix(X_num_scaled)
-    X_cat_encoded_sparse = csr_matrix(X_cat_encoded)
-    X_binary_sparse = csr_matrix(X_binary)
+    return categorical_features, binary_features, numeric_features
 
-    # Concatenate all preprocessed features
-    X_combined = hstack([X_cat_encoded_sparse, X_num_scaled_sparse, X_binary_sparse])
+#load airport geolocation data
 
-    # Transform the data with PCA
-    X_pred = pca.fit_transform(X_combined.toarray())
-
-    #returning fully preprocessed features, output as a numpy array
-    return X_pred
+def load_airport_geo_data(filepath):
+   df =  pd.read_csv(filepath)
+   return df

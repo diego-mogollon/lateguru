@@ -1,4 +1,4 @@
-#This file handles the encoding of categorical features.
+#This encoders.py file handles the encoding of categorical features.
 
 from sklearn.preprocessing import OneHotEncoder
 

@@ -1,4 +1,4 @@
-#This file focuses on scaling, feature concatenation, and PCA.
+#This preprocessor.py file focuses on scaling, feature concatenation, and PCA.
 
 import numpy as np
 from sklearn.decomposition import PCA
@@ -7,6 +7,8 @@ from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
 from sklearn.impute import SimpleImputer
+from category_encoders import TargetEncoder
+
 
 
 
@@ -16,32 +18,37 @@ Below is the new pipeline approach, which needs to be tested
 
 '''
 
-#Preprocessing pipeline for cat, num and bi features
-def create_preprocessing_pipeline(categorical_features, numeric_features, binary_features, apply_pca=False, n_components=10):
-    #Scaling numeric features
+def create_preprocessing_pipeline(onehot_features, target_encoded_feature, numeric_features, binary_features, apply_pca=False, n_components=10):
+    # Scaling numeric features
     numeric_transformer = Pipeline(steps=[
         ('scaler', StandardScaler())
     ])
     
-    #One-hot encoding for categorical features
-    categorical_transformer = Pipeline(steps=[
+    # One-hot encoding for most categorical features
+    onehot_transformer = Pipeline(steps=[
         ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
     ])
     
-    #Handling binary features as-is
+    # Target encoding for 'Dest' feature
+    target_encoder_transformer = Pipeline(steps=[
+        ('target_encoder', TargetEncoder())
+    ])
+    
+    # Handling binary features as-is
     binary_transformer = 'passthrough'
     
-    #Combine preprocessing pipelines
+    # Combine preprocessing pipelines
     preprocessor = ColumnTransformer(
         transformers=[
             ('num', numeric_transformer, numeric_features),
-            ('cat', categorical_transformer, categorical_features),
+            ('onehot', onehot_transformer, onehot_features),
+            ('target', target_encoder_transformer, target_encoded_feature),
             ('bin', binary_transformer, binary_features)
         ]
     )
     
     if apply_pca:
-        #Enable PCA if apply_pca=True
+        # Enable PCA if apply_pca=True
         preprocessor = Pipeline(steps=[
             ('preprocessor', preprocessor),
             ('pca', PCA(n_components=n_components))

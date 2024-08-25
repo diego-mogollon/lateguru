@@ -1,4 +1,4 @@
-#This file manages all data-related tasks, such as loading, splitting, and feature retrieval.
+#This data.py file manages all data-related tasks, such as loading, splitting, and feature retrieval.
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -76,6 +76,7 @@ def define_X_and_y(preprocessed_df):
 
     return X, y
 
+
 #Define Split_train_test
 def split_train_test(X, y, test_size=0.2, random_state=42):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
@@ -88,14 +89,15 @@ def sample_down(X, y, sample_size=0.01, random_state=42):
 
 #Define categorical, binary, numeric features
 def get_features():
-    categorical_features = ['CancellationReason', 'Origin', 'Dest', 'Carrier']
+    onehot_features = ['CancellationReason', 'Origin', 'Carrier']  # For OneHotEncoder
+    target_encoded_feature = ['Dest']  # For TargetEncoder
     binary_features = ['Cancelled', 'Delayed']
     numeric_features = ['DepDelayMinutes', 'CarrierDelay', 'NASDelay',
                         'SecurityDelay', 'LateAircraftDelay', 'Temperature', 'Feels_Like_Temperature',
                         'Altimeter_Pressure', 'Sea_Level_Pressure', 'Visibility', 'Wind_Speed',
                         'Wind_Gust', 'Precipitation', 'Ice_Accretion_3hr', 'Hour', 'Day_Of_Week', 'Month']
 
-    return categorical_features, binary_features, numeric_features
+    return onehot_features, target_encoded_feature, binary_features, numeric_features
 
 #load airport geolocation data
 

@@ -19,49 +19,45 @@ GAR_IMAGE = os.environ.get("GAR_IMAGE")
 GAR_MEMORY = os.environ.get("GAR_MEMORY")
 
 ##################  CONSTANTS  #####################
-LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), "mlops", "data")
-LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), "mlops", "training_outputs")
+LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), "lateguru", "data")
+# LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), "lateguru", "training_outputs")
 
 COLUMN_NAMES_RAW = ['Time', 'Origin', 'Dest', 'Carrier', 'Cancelled', 'CancellationReason',
        'Delayed', 'DepDelayMinutes', 'CarrierDelay', 'Weather_Delay_Length',
        'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Temperature',
        'Feels_Like_Temperature', 'Altimeter_Pressure', 'Sea_Level_Pressure',
        'Visibility', 'Wind_Speed', 'Wind_Gust', 'Precipitation',
-       'Ice_Accretion_3hr', 'Hour', 'Day_Of_Week', 'Month', 'Weather_Delayed']
+       'Ice_Accretion_3hr', 'Weather_Delayed']
 
 DTYPES_RAW = {
     "Time": "object",
     "Origin": "object",
     "Dest": "object",
     "Carrier": "object",
-    "Cancelled": "boolean",
+    "Cancelled": "bool",
     "CancellationReason": "object",
-    "Delayed": "boolean",
-    "DepDelayMinutes": "float64",
-    "CarrierDelay": "float64",
-    "Weather_Delay_Length": "float64",
-    "NASDelay": "float64",
-    "SecurityDelay": "float64",
-    "LateAircraftDelay": "float64",
-    "Temperature": "float64",
-    "Feels_Like_Temperature": "float64",
-    "Altimeter_Pressure": "float64",
-    "Sea_Level_Pressure": "float64",
-    "Visibility": "float64",
-    "Wind_Speed": "float64",
-    "Wind_Gust": "float64",
-    "Precipitation": "float64",
-    "Ice_Accretion_3hr": "float64",
-    "Hour": "float64",
-    "Day_Of_Week": "float64",
-    "Month": "float64",
-    "Weather_Delayed": "boolean"
+    "Delayed": "bool",
+    "DepDelayMinutes": "float16",
+    "CarrierDelay": "float16",
+    "Weather_Delay_Length": "float16",
+    "NASDelay": "float16",
+    "SecurityDelay": "float16",
+    "LateAircraftDelay": "float16",
+    "Temperature": "float16",
+    "Feels_Like_Temperature": "float16",
+    "Altimeter_Pressure": "float16",
+    "Sea_Level_Pressure": "float16",
+    "Visibility": "float16",
+    "Wind_Speed": "float16",
+    "Wind_Gust": "float16",
+    "Precipitation": "float16",
+    "Ice_Accretion_3hr": "float16",
+    "Weather_Delayed": "bool"
 }
 
 DTYPES_PROCESSED = np.float32
 
 OW_API_KEY=os.environ.get("OMW_API_KEY")
-
 
 ################## VALIDATIONS #################
 
@@ -73,7 +69,6 @@ def validate_env_value(env, valid_options):
     env_value = os.environ[env]
     if env_value not in valid_options:
         raise NameError(f"Invalid value for {env} in `.env` file: {env_value} must be in {valid_options}")
-
 
 for env, valid_options in env_valid_options.items():
     validate_env_value(env, valid_options)

@@ -2,6 +2,7 @@
 
 import os
 import joblib
+from lateguru_ml.params import *
 
 # Define the directory path where models should be saved and loaded
 model_directory = os.path.join(os.path.dirname(__file__), '..', '..', 'model')
@@ -18,3 +19,9 @@ def load_model(filename):
     model = joblib.load(filepath)
     print(f"Model loaded from {filepath}")
     return model
+
+if __name__ == "__main__":
+    if MODEL_TARGET == 'gcs':
+        print('saving to cloud')
+    else:
+        print('saving locally')

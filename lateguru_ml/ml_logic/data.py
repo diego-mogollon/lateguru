@@ -95,7 +95,7 @@ def get_features():
     numeric_features = ['DepDelayMinutes', 'CarrierDelay', 'NASDelay',
                         'SecurityDelay', 'LateAircraftDelay', 'Temperature', 'Feels_Like_Temperature',
                         'Altimeter_Pressure', 'Sea_Level_Pressure', 'Visibility', 'Wind_Speed',
-                        'Wind_Gust', 'Precipitation', 'Ice_Accretion_3hr', 'Hour', 'Day_Of_Week', 'Month']
+                        'Wind_Gust', 'Precipitation', 'Hour', 'Day_Of_Week', 'Month']
 
     return onehot_features, target_encoded_feature, binary_features, numeric_features
 

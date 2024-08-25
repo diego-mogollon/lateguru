@@ -1,5 +1,5 @@
 import numpy as np
-from lateguru_ml.ml_logic.data import load_preprocessed_data, define_y_and_X, split_train_test, sample_down, get_features
+from lateguru_ml.ml_logic.data import load_preprocessed_data, define_X_and_y, split_train_test, sample_down, get_features
 from lateguru_ml.ml_logic.encoders import encode_categorical_features
 from lateguru_ml.ml_logic.preprocessor import scale_numeric_features, concatenate_features, apply_pca, preprocess_features
 from lateguru_ml.ml_logic.model import initialise_xgboost_model, fit_model, predict
@@ -12,7 +12,7 @@ file_path = 'data/preprocessed_treated_outliers.csv'
 preprocessed_df = load_preprocessed_data(file_path)
 
 # Define X and y
-X, y = define_y_and_X(preprocessed_df)
+X, y = define_X_and_y(preprocessed_df)
 
 # Split the data into train and test sets
 X_train, X_test, y_train, y_test = split_train_test(X, y)

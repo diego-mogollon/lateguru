@@ -1,12 +1,13 @@
 #This file focuses on scaling, feature concatenation, and PCA.
 
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import OneHotEncoder
-from scipy.sparse import hstack, csr_matrix
-from sklearn.pipeline import Pipeline
+
+from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
+from sklearn.impute import SimpleImputer
+
 
 
 '''
@@ -57,8 +58,57 @@ def preprocess_features(X, categorical_features, numeric_features, binary_featur
     X_preprocessed = preprocessor.fit_transform(X)
     
     return X_preprocessed
+  
+'''
+
+Below is a test pipeline by Connor for API. We will end with one pipeline after completing tests and models.
+
+'''
+
+def create_sklearn_preprocessor():
+
+    categorical_features = ['Origin', 'Dest', 'Route', 'Carrier']
+
+    numerical_features = [
+        'DayOfWeek', 'HourOfDay', 'Temperature', 'Feels_Like_Temperature',
+        'Altimeter_Pressure', 'Sea_Level_Pressure', 'Visibility',
+        'Wind_Speed', 'Wind_Gust', 'Precipitation', 'Ice_Accretion_3hr',
+        'CarrierAvgDelay', 'Month'
+    ]
+
+    categorical_transformer = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='most_frequent')),
+        ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
+    ])
 
 
+    numerical_transformer = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='mean')),
+        ('scaler', StandardScaler())
+    ])
+
+
+    final_preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', numerical_transformer, numerical_features),
+            ('cat', categorical_transformer, categorical_features)
+        ],
+        n_jobs=-1
+    )
+
+    return final_preprocessor
+
+
+def preprocess_features_v2(X) :
+
+    preprocessor = create_sklearn_preprocessor()
+
+    X_processed = preprocessor.fit_transform(X)
+
+    # print(f"✅ X_processed, with shape {X_processed.shape}")
+
+    return X_processed
+  
 '''
 
 OLD CODE WITHOUT PIPELINE APPROACH HERE BELOW. WILL REMOVE ONCE TESTING THE PIPELINE APPROACH WORKS AS EXPECTED.

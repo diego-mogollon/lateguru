@@ -11,7 +11,7 @@ def load_preprocessed_data(file_path):
 #Load data from gcp (PENDING)
 
 #Define X and y
-def define_y_and_X(preprocessed_df):
+def define_X_and_y(preprocessed_df):
     # Define X and y
     X = preprocessed_df.drop(columns=['Weather_Delay_Length', 'Weather_Delayed'])
     y = preprocessed_df['Weather_Delayed']
@@ -24,6 +24,7 @@ def define_y_and_X(preprocessed_df):
         X[col] = X[col].astype('float32')
 
     return X, y
+
 
 #Define Split_train_test
 def split_train_test(X, y, test_size=0.2, random_state=42):

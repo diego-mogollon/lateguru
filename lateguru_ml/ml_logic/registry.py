@@ -1,4 +1,4 @@
-#This file handles the saving/loading of pkl file and in the future may be used for MLFlow/Prefect
+#This registry.py file handles the saving/loading of pkl file and in the future may be used for MLFlow/Prefect
 
 import os
 import joblib

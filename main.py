@@ -1,24 +1,11 @@
 import numpy as np
 import pandas as pd
-
-# from pathlib import Path
-# from dateutil.parser import parse
-
-# from lateguru_ml.params import *
-# from lateguru_ml.ml_logic.data import load_preprocessed_data, define_y_and_X, split_train_test, sample_down, get_features, get_data, compress_data, check_time, add_data_features
-# from lateguru_ml.ml_logic.encoders import encode_categorical_features
-# from lateguru_ml.ml_logic.preprocessor import scale_numeric_features, concatenate_features, apply_pca, preprocess_features,
-# from lateguru_ml.ml_logic.model import initialise_xgboost_model, fit_model, predict
-# from lateguru_ml.ml_logic.registry import save_model, load_model
-
 import os
-import pandas as pd
 from joblib import dump
 import matplotlib.pyplot as plt
 from sklearn.model_selection import learning_curve
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-)
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+
 from lateguru_ml.ml_logic.data import (
     load_preprocessed_data,
     check_time,
@@ -26,13 +13,10 @@ from lateguru_ml.ml_logic.data import (
     define_X_and_y,
     split_train_test,
     sample_down,
-    get_features,
-    scale_down_data_types
+    get_features
 )
-from lateguru_ml.ml_logic.preprocessor import create_preprocessing_pipeline, preprocess_features 
+from lateguru_ml.ml_logic.preprocessor import create_preprocessing_pipeline, preprocess_features
 from lateguru_ml.ml_logic.model import model as xgb_model, fit_model
-
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 
 # Define file paths
@@ -183,6 +167,17 @@ if __name__ == "__main__":
 CODE BY MARK - YET TO BE TESTED
 
 """
+
+# from pathlib import Path
+# from dateutil.parser import parse
+
+# from lateguru_ml.params import *
+# from lateguru_ml.ml_logic.data import load_preprocessed_data, define_y_and_X, split_train_test, sample_down, get_features, get_data, compress_data, check_time, add_data_features
+# from lateguru_ml.ml_logic.encoders import encode_categorical_features
+# from lateguru_ml.ml_logic.preprocessor import scale_numeric_features, concatenate_features, apply_pca, preprocess_features,
+# from lateguru_ml.ml_logic.model import initialise_xgboost_model, fit_model, predict
+# from lateguru_ml.ml_logic.registry import save_model, load_model
+
 # Download dataset and preprocess before model training
 
 # def preprocess(min_date:str = '2021-01-01 00:00:00', max_date:str = '2023-12-31 00:00:00') -> None:

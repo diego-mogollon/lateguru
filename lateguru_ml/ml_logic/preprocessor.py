@@ -9,9 +9,6 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransfo
 from sklearn.impute import SimpleImputer
 from category_encoders import TargetEncoder
 
-
-
-
 '''
 
 Below is the new pipeline approach, which needs to be tested

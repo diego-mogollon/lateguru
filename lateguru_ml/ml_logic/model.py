@@ -4,16 +4,17 @@ import xgboost as xgb
 
 # Define the XGBClassifier 
 model = xgb.XGBClassifier(
-    use_label_encoder=False,  # Disable label encoder
     eval_metric='logloss',    # Logloss as the evaluation metric
     random_state=42,          # For reproducibility
-    max_depth=9,              # Maximum depth of the trees
-    n_estimators=900,         # Number of boosting rounds
+    max_depth=8,              # Maximum depth of the trees
+    n_estimators=800,         # Number of boosting rounds
     learning_rate=0.005,       # Learning rate for the boosting process
-    n_jobs=4,                 # For testing, going with 4 instead of -1 to avoid crashing
-    min_child_weight=10,       # Makes the model more conservative and prevents learning overly specific rules
-    gamma=1.0,                # Makes the model more conservative by requiring a larger reduction in the loss to make a split
-    scale_pos_weight=1.4965582588005606  # Balancing of positive and negative weights
+    n_jobs=4,                 # Number of parallel threads
+    min_child_weight=15,       # Minimum sum of instance weight (hessian) needed in a child
+    gamma=1.0,                # Minimum loss reduction required to make a further partition
+    scale_pos_weight=1.4965582588005606,  # Balancing of positive and negative weights
+    alpha=2.0,
+    reg_lambda=3.0
 )
 
 #Fit the model

@@ -2,6 +2,7 @@
 
 import os
 import joblib
+from lateguru_ml.params import *
 
 # Define the directory path where models should be saved and loaded
 model_directory = os.path.join(os.path.dirname(__file__), '..', '..', 'model')

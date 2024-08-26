@@ -19,9 +19,3 @@ def load_model(filename):
     model = joblib.load(filepath)
     print(f"Model loaded from {filepath}")
     return model
-
-if __name__ == "__main__":
-    if MODEL_TARGET == 'gcs':
-        print('saving to cloud')
-    else:
-        print('saving locally')

@@ -1,3 +1,5 @@
+#this main.py file will handle all the ml_logic logic, calling main functions from params.py, utils.py, data.py, encoder.py, preprocessor.py, model.py, and registry.py
+
 import numpy as np
 import pandas as pd
 import os
@@ -17,7 +19,6 @@ from lateguru_ml.ml_logic.data import (
 )
 from lateguru_ml.ml_logic.preprocessor import create_preprocessing_pipeline, preprocess_features
 from lateguru_ml.ml_logic.model import model as xgb_model, fit_model
-
 
 # Define file paths
 DATA_FILE = 'Top_5_Airports.csv'
@@ -63,18 +64,9 @@ def main():
     y_train = y_train.reset_index(drop=True)
     y_test = y_test.reset_index(drop=True)
 
-    # Check if y_train or y_test are empty
-    if y_train.empty or y_test.empty:
-        print("Error: y_train or y_test is empty.")
-        return
-
     # Ensure indices are aligned before preprocessing
     y_train.index = X_train.index
     y_test.index = X_test.index
-
-    # Ensure y_train and y_test are aligned with X_train and X_test
-    assert X_train.index.equals(y_train.index), "Error: X_train and y_train indices do not match."
-    assert X_test.index.equals(y_test.index), "Error: X_test and y_test indices do not match."
 
     # Get feature lists for preprocessing
     print("Retrieving feature lists for preprocessing...")
@@ -86,11 +78,11 @@ def main():
         onehot_features=onehot_features,
         target_encoded_feature=target_encoded_feature,
         numeric_features=numeric_features,
-        binary_features=[],  # No binary features in the current setup
-        apply_pca=False  # Adjust if you want to use PCA
+        binary_features=[],  # No binary features
+        apply_pca=False  # Adjust if using PCA (not needed for this new data set - may remove PCA function this week)
     )
     
-    # Preprocess features with `y`
+    # Preprocess features - Important: TargetEncoder requires to pass 'y'
     print("Preprocessing features...")
     try:
         X_train_preprocessed = preprocess_features(X_train, onehot_features, target_encoded_feature, numeric_features, y_train, [])
@@ -104,6 +96,7 @@ def main():
     print("Training the model...")
     model = fit_model(xgb_model, X_train_preprocessed, y_train)
     
+    # Evaluate the model
     def evaluate_model(model, X_test, y_test):
         y_pred = model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
@@ -117,8 +110,7 @@ def main():
         print(f"Recall: {recall:.4f}")
         print(f"F1 Score: {f1:.4f}")
         print(f"ROC AUC Score: {roc_auc:.4f}")
-    
-    # Evaluate the model
+
     print("Evaluating the model...")
     evaluate_model(model, X_test_preprocessed, y_test)
     
@@ -130,6 +122,7 @@ def main():
     
     print(f"Model saved to {MODEL_FILE}")
     
+    #Set learning curve
     def plot_learning_curve(model, X, y):
         train_sizes, train_scores, validation_scores = learning_curve(
             model, X, y, train_sizes=np.linspace(0.1, 1.0, 10), cv=5, scoring='recall'
@@ -147,7 +140,7 @@ def main():
         plt.plot(train_sizes, validation_scores_mean, label='Validation score', color='green')
         plt.fill_between(train_sizes, validation_scores_mean - validation_scores_std,
                         validation_scores_mean + validation_scores_std, alpha=0.2, color='green')
-        plt.title('Optimized Learning Curve for XGBClassifier')
+        plt.title('Learning Curve for Lateguru XGBoost Model')
         plt.xlabel('Training Set Size')
         plt.ylabel('Recall Score')
         plt.legend(loc='best')
@@ -203,21 +196,6 @@ CODE BY MARK - YET TO BE TESTED
 #         cache_path=data_query_cache_path,
 #         data_has_header=True
 #     )
-
-#     # Compress data
-#     data_compress = compress_data(data_query)
-
-#     # Check 'Time' dtype
-#     data_time = check_time(data_compress)
-
-#     # Feature engineering
-
-
-
-#     # Process data
-#     preprocessed_df =
-
-#     print("✅ preprocess() done \n")
 
 # def train(
 #         min_date:str = '2021-01-01 00:00:00',

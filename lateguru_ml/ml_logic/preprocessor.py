@@ -55,15 +55,35 @@ def create_preprocessing_pipeline(onehot_features, target_encoded_feature, numer
         ])
     return preprocessor
 
-#Apply pipeline
-def preprocess_features(X, categorical_features, numeric_features, binary_features, apply_pca=False, n_components=10):
+def preprocess_features(X, onehot_features, target_encoded_feature, numeric_features, y, binary_features=None):
+    # Ensure y is not None and has the correct length
+    if y is None or len(y) == 0:
+        raise ValueError("y cannot be None or empty during preprocessing.")
+    
+    if binary_features is None:
+        binary_features = []
+
+    # Debugging: Print length and content of y
+    print(f"Length of y before preprocessing: {len(y)}")
+    print(f"First few rows of y:\n{y.head()}")
+    
+    # Create the preprocessing pipeline
     preprocessor = create_preprocessing_pipeline(
-        categorical_features, numeric_features, binary_features, apply_pca, n_components
+        onehot_features=onehot_features,
+        target_encoded_feature=target_encoded_feature,
+        numeric_features=numeric_features,
+        binary_features=binary_features
     )
-    
-    # Fit and transform the data
-    X_preprocessed = preprocessor.fit_transform(X)
-    
+
+    # Fit and transform the data using the preprocessor
+    try:
+        X_preprocessed = preprocessor.fit_transform(X, y)
+    except ValueError as e:
+        print(f"Error during preprocessing: {e}")
+        print(f"X shape: {X.shape}, y length: {len(y)}")
+        print(f"X index: {X.index}, y index: {y.index}")
+        raise e
+
     return X_preprocessed
   
 '''

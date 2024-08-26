@@ -1,5 +1,5 @@
-# import numpy as np
-# import pandas as pd
+import numpy as np
+import pandas as pd
 
 # from pathlib import Path
 # from dateutil.parser import parse
@@ -32,6 +32,9 @@ from lateguru_ml.ml_logic.data import (
 from lateguru_ml.ml_logic.preprocessor import create_preprocessing_pipeline, preprocess_features 
 from lateguru_ml.ml_logic.model import model as xgb_model, fit_model
 
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+
+
 # Define file paths
 DATA_FILE = 'Top_5_Airports.csv'
 DATA_DIR = 'data'
@@ -58,14 +61,37 @@ def main():
     print("Defining X and y...")
     X, y = define_X_and_y(preprocessed_df)
     
-    # Sample down the dataset
+    # Sample down the dataset to 1%
     print("Sampling down the dataset...")
     X_sampled, y_sampled = sample_down(X, y, sample_size=0.01)
+    
+    # Reset index after sampling
+    X_sampled = X_sampled.reset_index(drop=True)
+    y_sampled = y_sampled.reset_index(drop=True)
     
     # Split the data into train and test sets
     print("Splitting data into train and test sets...")
     X_train, X_test, y_train, y_test = split_train_test(X_sampled, y_sampled)
     
+    # Reset index after splitting
+    X_train = X_train.reset_index(drop=True)
+    X_test = X_test.reset_index(drop=True)
+    y_train = y_train.reset_index(drop=True)
+    y_test = y_test.reset_index(drop=True)
+
+    # Check if y_train or y_test are empty
+    if y_train.empty or y_test.empty:
+        print("Error: y_train or y_test is empty.")
+        return
+
+    # Ensure indices are aligned before preprocessing
+    y_train.index = X_train.index
+    y_test.index = X_test.index
+
+    # Ensure y_train and y_test are aligned with X_train and X_test
+    assert X_train.index.equals(y_train.index), "Error: X_train and y_train indices do not match."
+    assert X_test.index.equals(y_test.index), "Error: X_test and y_test indices do not match."
+
     # Get feature lists for preprocessing
     print("Retrieving feature lists for preprocessing...")
     onehot_features, target_encoded_feature, numeric_features = get_features()
@@ -80,14 +106,33 @@ def main():
         apply_pca=False  # Adjust if you want to use PCA
     )
     
-    # Preprocess features
+    # Preprocess features with `y`
     print("Preprocessing features...")
-    X_train_preprocessed = preprocess_features(X_train, onehot_features, target_encoded_feature, numeric_features, [])
-    X_test_preprocessed = preprocess_features(X_test, onehot_features, target_encoded_feature, numeric_features, [])
+    try:
+        X_train_preprocessed = preprocess_features(X_train, onehot_features, target_encoded_feature, numeric_features, y_train, [])
+        X_test_preprocessed = preprocess_features(X_test, onehot_features, target_encoded_feature, numeric_features, y_test, [])
+    except ValueError as e:
+        print(f"Error during preprocessing: {e}")
+        print(f"X_train index: {X_train.index}, y_train index: {y_train.index}")
+        return
     
     # Train the model
     print("Training the model...")
     model = fit_model(xgb_model, X_train_preprocessed, y_train)
+    
+    def evaluate_model(model, X_test, y_test):
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred)
+        roc_auc = roc_auc_score(y_test, y_pred)
+
+        print(f"Accuracy: {accuracy:.4f}")
+        print(f"Precision: {precision:.4f}")
+        print(f"Recall: {recall:.4f}")
+        print(f"F1 Score: {f1:.4f}")
+        print(f"ROC AUC Score: {roc_auc:.4f}")
     
     # Evaluate the model
     print("Evaluating the model...")
@@ -101,49 +146,33 @@ def main():
     
     print(f"Model saved to {MODEL_FILE}")
     
+    def plot_learning_curve(model, X, y):
+        train_sizes, train_scores, validation_scores = learning_curve(
+            model, X, y, train_sizes=np.linspace(0.1, 1.0, 10), cv=5, scoring='recall'
+        )
+
+        train_scores_mean = train_scores.mean(axis=1)
+        train_scores_std = train_scores.std(axis=1)
+        validation_scores_mean = validation_scores.mean(axis=1)
+        validation_scores_std = validation_scores.std(axis=1)
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(train_sizes, train_scores_mean, label='Training score', color='blue')
+        plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
+                        train_scores_mean + train_scores_std, alpha=0.2, color='blue')
+        plt.plot(train_sizes, validation_scores_mean, label='Validation score', color='green')
+        plt.fill_between(train_sizes, validation_scores_mean - validation_scores_std,
+                        validation_scores_mean + validation_scores_std, alpha=0.2, color='green')
+        plt.title('Optimized Learning Curve for XGBClassifier')
+        plt.xlabel('Training Set Size')
+        plt.ylabel('Recall Score')
+        plt.legend(loc='best')
+        plt.grid(True)
+        plt.show()
+    
     # Plot learning curve
     print("Plotting learning curve...")
     plot_learning_curve(model, X_train_preprocessed, y_train)
-    
-def evaluate_model(model, X_test, y_test):
-    """Evaluate the model using various performance metrics."""
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-    roc_auc = roc_auc_score(y_test, y_pred)
-
-    print(f"Accuracy: {accuracy:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall: {recall:.4f}")
-    print(f"F1 Score: {f1:.4f}")
-    print(f"ROC AUC Score: {roc_auc:.4f}")
-
-def plot_learning_curve(model, X, y):
-    """Plot the learning curve to show the model's performance."""
-    train_sizes, train_scores, validation_scores = learning_curve(
-        model, X, y, train_sizes=np.linspace(0.1, 1.0, 10), cv=5, scoring='recall'
-    )
-
-    train_scores_mean = train_scores.mean(axis=1)
-    train_scores_std = train_scores.std(axis=1)
-    validation_scores_mean = validation_scores.mean(axis=1)
-    validation_scores_std = validation_scores.std(axis=1)
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(train_sizes, train_scores_mean, label='Training score', color='blue')
-    plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
-                     train_scores_mean + train_scores_std, alpha=0.2, color='blue')
-    plt.plot(train_sizes, validation_scores_mean, label='Validation score', color='green')
-    plt.fill_between(train_sizes, validation_scores_mean - validation_scores_std,
-                     validation_scores_mean + validation_scores_std, alpha=0.2, color='green')
-    plt.title('Optimized Learning Curve for XGBClassifier')
-    plt.xlabel('Training Set Size')
-    plt.ylabel('Recall Score')
-    plt.legend(loc='best')
-    plt.grid(True)
-    plt.show()
 
 if __name__ == "__main__":
     main()

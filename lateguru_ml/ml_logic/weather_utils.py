@@ -2,6 +2,7 @@ import pandas as pd
 from lateguru_ml.ml_logic.data import load_airport_geo_data
 from lateguru_ml.params import OW_API_KEY
 import requests
+import os
 
 #should I handle this with functions or hardcode the object like below?
 #global variables

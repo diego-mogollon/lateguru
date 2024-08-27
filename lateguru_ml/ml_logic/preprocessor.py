@@ -2,7 +2,7 @@
 
 import numpy as np
 from sklearn.decomposition import PCA
-
+import pandas as pd
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
@@ -14,20 +14,20 @@ def create_preprocessing_pipeline(onehot_features, target_encoded_feature, numer
     numeric_transformer = Pipeline(steps=[
         ('scaler', StandardScaler())
     ])
-    
+
     # One-hot encoding for most categorical features
     onehot_transformer = Pipeline(steps=[
         ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
     ])
-    
+
     # Target encoding for 'Dest' feature
     target_encoder_transformer = Pipeline(steps=[
         ('target_encoder', TargetEncoder())
     ])
-    
+
     # Handling binary features as-is
     binary_transformer = 'passthrough'
-    
+
     # Combine preprocessing pipelines
     preprocessor = ColumnTransformer(
         transformers=[
@@ -37,7 +37,7 @@ def create_preprocessing_pipeline(onehot_features, target_encoded_feature, numer
             ('bin', binary_transformer, binary_features)
         ]
     )
-    
+
     if apply_pca:
         # Enable PCA if apply_pca=True
         preprocessor = Pipeline(steps=[
@@ -50,14 +50,14 @@ def preprocess_features(X, onehot_features, target_encoded_feature, numeric_feat
     # Ensure y is not None and has the correct length
     if y is None or len(y) == 0:
         raise ValueError("y cannot be None or empty during preprocessing.")
-    
+
     if binary_features is None:
         binary_features = []
 
     # Debugging: Print length and content of y
     print(f"Length of y before preprocessing: {len(y)}")
     print(f"First few rows of y:\n{y.head()}")
-    
+
     # Create the preprocessing pipeline
     preprocessor = create_preprocessing_pipeline(
         onehot_features=onehot_features,
@@ -76,7 +76,7 @@ def preprocess_features(X, onehot_features, target_encoded_feature, numeric_feat
         raise e
 
     return X_preprocessed
-  
+
 '''
 
 Below is a test pipeline by Connor for API. We will end with one pipeline after completing tests and models.
@@ -122,6 +122,8 @@ def preprocess_features_v2(X) :
     preprocessor = create_sklearn_preprocessor()
 
     X_processed = preprocessor.fit_transform(X)
+
+    X_processed = pd.DataFrame(X_processed, columns=X.columns)
 
     # print(f"✅ X_processed, with shape {X_processed.shape}")
 

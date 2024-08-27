@@ -57,7 +57,7 @@ DTYPES_RAW = {
 
 DTYPES_PROCESSED = np.float32
 
-OW_API_KEY=os.environ.get("OMW_API_KEY")
+OW_API_KEY=os.environ.get("OW_API_KEY")
 
 ################## VALIDATIONS #################
 

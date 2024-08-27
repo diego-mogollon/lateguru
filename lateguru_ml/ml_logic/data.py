@@ -40,19 +40,19 @@ def check_time(df):
 def add_data_features(df):
     # Ensure 'Time' column is correctly formatted to datetime
     df['Time'] = pd.to_datetime(df['Time'])
-    
+
     # Extract time-based features
     df['DayOfWeek'] = df['Time'].dt.dayofweek
     df['HourOfDay'] = df['Time'].dt.hour
     df['Month'] = df['Time'].dt.month
-    
+
     # Calculate the average delay by carrier
     # Clean up carrier names by removing any periods
     df['Carrier'] = df['Carrier'].str.replace('.', '', regex=False)
-    
+
     # Compute the average departure delay for each carrier
     carrier_avg_delay = df.groupby('Carrier')['DepDelayMinutes'].mean()
-    
+
     # Map the average delay to the DataFrame
     df['CarrierAvgDelay'] = df['Carrier'].map(carrier_avg_delay)
     return df
@@ -65,13 +65,13 @@ def define_X_and_y(preprocessed_df):
         'Sea_Level_Pressure', 'Visibility', 'Wind_Speed', 'Wind_Gust',
         'Precipitation', 'CarrierAvgDelay', 'Month'
     ]
-    
+
     # Create X with selected features
     X = preprocessed_df[features]
-    
+
     # Apply the scaling down of data types
     X = scale_down_data_types(X)
-    
+
     # Define y as the 'Delayed' column, cast to int
     y = preprocessed_df['Delayed'].astype(int)
     return X, y
@@ -82,7 +82,7 @@ def scale_down_data_types(X: pd.DataFrame) -> pd.DataFrame:
 
     for col in X.select_dtypes(include=['float']).columns:
         X.loc[:, col] = X[col].astype('float32')
-    
+
     return X
 
 #Define Split_train_test

@@ -3,8 +3,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from google.cloud import bigquery
-from colorama import Fore, Style
+#from google.cloud import bigquery
+#from colorama import Fore, Style
 from pathlib import Path
 
 from lateguru_ml.params import *
@@ -47,8 +47,8 @@ def check_time(df):
 
     # If not datetime, convert it to datetime
     if not pd.api.types.is_datetime64_any_dtype(df['Time']):
-    df['Time'] = pd.to_datetime(df['Time'])
-    print(f"After conversion, Data type of 'Time': {df['Time'].dtype}")
+        df['Time'] = pd.to_datetime(df['Time'])
+        print(f"After conversion, Data type of 'Time': {df['Time'].dtype}")
 
     return df
 

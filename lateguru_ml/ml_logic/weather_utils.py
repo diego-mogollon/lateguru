@@ -44,7 +44,7 @@ def get_weather_data(lat, lon):
     json_response = response.json()
 
 
-    ''' weather_dict = {
+    weather_dict = {
     "temp": json_response["main"]['temp'],
     "feels_like_temp": json_response['main']['feels_like'],
     "alt_pressure": json_response['main']['pressure'],
@@ -53,7 +53,7 @@ def get_weather_data(lat, lon):
     "wind_speed": json_response['wind']['speed'],
     "wind_gust": json_response['wind']['deg']
     #precipitation and ice accretion to be added
-    }'''
+    }
 
     #clean up json response object before outputting data
-    return json_response
+    return weather_dict

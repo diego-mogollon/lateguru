@@ -2,7 +2,7 @@
 
 import numpy as np
 from sklearn.decomposition import PCA
-
+import pandas as pd
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
@@ -22,15 +22,15 @@ def create_preprocessing_pipeline(categorical_features, numeric_features, binary
     numeric_transformer = Pipeline(steps=[
         ('scaler', StandardScaler())
     ])
-    
+
     #One-hot encoding for categorical features
     categorical_transformer = Pipeline(steps=[
         ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
     ])
-    
+
     #Handling binary features as-is
     binary_transformer = 'passthrough'
-    
+
     #Combine preprocessing pipelines
     preprocessor = ColumnTransformer(
         transformers=[
@@ -39,7 +39,7 @@ def create_preprocessing_pipeline(categorical_features, numeric_features, binary
             ('bin', binary_transformer, binary_features)
         ]
     )
-    
+
     if apply_pca:
         #Enable PCA if apply_pca=True
         preprocessor = Pipeline(steps=[
@@ -53,12 +53,12 @@ def preprocess_features(X, categorical_features, numeric_features, binary_featur
     preprocessor = create_preprocessing_pipeline(
         categorical_features, numeric_features, binary_features, apply_pca, n_components
     )
-    
+
     # Fit and transform the data
     X_preprocessed = preprocessor.fit_transform(X)
-    
+
     return X_preprocessed
-  
+
 '''
 
 Below is a test pipeline by Connor for API. We will end with one pipeline after completing tests and models.
@@ -105,10 +105,12 @@ def preprocess_features_v2(X) :
 
     X_processed = preprocessor.fit_transform(X)
 
+    X_processed = pd.DataFrame(X_processed, columns=X.columns)
+
     # print(f"✅ X_processed, with shape {X_processed.shape}")
 
     return X_processed
-  
+
 '''
 
 OLD CODE WITHOUT PIPELINE APPROACH HERE BELOW. WILL REMOVE ONCE TESTING THE PIPELINE APPROACH WORKS AS EXPECTED.
@@ -125,23 +127,23 @@ OLD CODE WITHOUT PIPELINE APPROACH HERE BELOW. WILL REMOVE ONCE TESTING THE PIPE
 
 # #Combine categorical, scaled numeric, and binary features into single array
 # def concatenate_features(X_train_encoded, X_train_scaled, X_train_binary, X_test_encoded, X_test_scaled, X_test_binary):
-    
+
 #     X_train_scaled_sparse = csr_matrix(X_train_scaled)
 #     X_train_binary_sparse = csr_matrix(X_train_binary)
-    
+
 #     X_test_scaled_sparse = csr_matrix(X_test_scaled)
 #     X_test_binary_sparse = csr_matrix(X_test_binary)
-    
+
 #     X_train_preprocessed = hstack([csr_matrix(X_train_encoded), X_train_scaled_sparse, X_train_binary_sparse])
 #     X_test_preprocessed = hstack([csr_matrix(X_test_encoded), X_test_scaled_sparse, X_test_binary_sparse])
-    
+
 #     return X_train_preprocessed, X_test_preprocessed
 
 # #Apply PCA to scaled numeric features
 # def apply_pca(X_train_scaled, X_test_scaled, n_components=10):
 #     pca = PCA(n_components=n_components)
-#     X_train_pca = pca.fit_transform(X_train_scaled)    
-#     X_test_pca = pca.transform(X_test_scaled)   
+#     X_train_pca = pca.fit_transform(X_train_scaled)
+#     X_test_pca = pca.transform(X_test_scaled)
 
 #     return X_train_pca, X_test_pca
 
@@ -162,7 +164,7 @@ OLD CODE WITHOUT PIPELINE APPROACH HERE BELOW. WILL REMOVE ONCE TESTING THE PIPE
 #     #scaling numerical features and encoding categorical features
 #     X_num_scaled = scaler.transform(X_num)
 #     X_cat_encoded = ohe.transform(X_cat)
-    
+
 #     # Convert to sparse matrices
 #     X_num_scaled_sparse = csr_matrix(X_num_scaled)
 #     X_cat_encoded_sparse = csr_matrix(X_cat_encoded)

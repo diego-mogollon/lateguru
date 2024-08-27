@@ -39,7 +39,7 @@ def get_weather_data(lat, lon):
     #lon= 144.844788
 
     url = "https://api.openweathermap.org/data/2.5/weather?"
-    params = {'lat': str(lat), 'lon':str(lon), "appid":OW_API_KEY}
+    params = {'lat': str(lat), 'lon':str(lon), "appid":OW_API_KEY, "units":'imperial'}
     response = requests.get(url, params=params)
     json_response = response.json()
 
@@ -51,9 +51,21 @@ def get_weather_data(lat, lon):
     "sl_pressure": json_response['main']['sea_level'],
     "visibility": json_response['visibility'],
     "wind_speed": json_response['wind']['speed'],
-    "wind_gust": json_response['wind']['deg']
+    "wind_gust": json_response['wind']['deg'],
+    "rain": json_response['rain']["1h"]
     #precipitation and ice accretion to be added
     }
 
     #clean up json response object before outputting data
     return weather_dict
+
+
+#function to convert kelvin to fahrenheit as
+#openweather temp and feels like temp variables are default in Kelvin
+#but dataset temp is fahrenheit and feels like temp is kelvin
+
+def fahrenheit_to_kelvin(fahrenheit_feels_like_temp):
+    '''Function to convert the feels like temperature from Fahrenheit
+    in open weather response to Kelvin as it is in the FORWW dataset'''
+    kelvin_feels_like_temp = (fahrenheit_feels_like_temp + 459.67) * 1.8
+    return float(kelvin_feels_like_temp)

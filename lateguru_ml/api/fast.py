@@ -50,19 +50,7 @@ def predict_delay(
     day_of_week: float, #number corresponding to day of week
     month: float, #month of year at time of departure
 
-    #delayed: bool, #True if flight delayed, else False (default)
-    #delay_len: float, #amount of mins flight is delayed
-    #carrier_avg_delay: float, #amount of mins on average that each carrier is delayed when delayed
-    #temperature: float, #temperature in origin at time of prediction
-    #feels_like_temp: float, #feels like temperature in origin at time of prediction
-    #alt_pressure: float, #air pressure at origin
-    #sl_pressure: float, #sea level pressure at origin
-    #visibility: float, #measure of how clear visbility at origin is
-    #wind_speed: float, #measure of wind speed in km/h
-    #wind_gust: float, #measure of wind gust strength at origin
-    #precipitation: float, #measure of rainfall at origin
-    #ice_accretion_3hr: float, #measure of ice at origin
-    #route: str, #concatenation of origin and destination airport string
+
 ):
     """Make a prediction based on inputs as to whether the flight is likely
     to be delayed by weather
@@ -72,32 +60,17 @@ def predict_delay(
     X_pred = pd.DataFrame({
         "Origin": [str(origin)],
         "Dest": [str(destination)],
-        #"Route": [str('LAX_JFK')],
         "Carrier": [str(carrier)],
-
-        #"delay_len": [float(delay_len)],
-        #'''"temperature": [float(X_weather['main']['temp'])],
-        #"feels_like_temp": [float(X_weather['main']['feels_like'])],
-        #"alt_pressure": [float(X_weather['main']['pressure'])],
-        #"sl_pressure": [float(X_weather['main']['sea_level'])],
-        #"visibility": [float(X_weather['visibility'])],
-        #"wind_speed": [float(X_weather['wind']['speed'])],
-        #"wind_gust": [float(X_weather['wind']['gust'])],'''
-
+        "temp": [float(X_weather['temp'])],
+        "feels_like_temp": [float(X_weather['feels_like_temp'])],
+        "alt_pressure": [float(X_weather['alt_pressure'])],
+        "sl_pressure": [float(X_weather['sl_pressure'])],
+        "visibility": [float(X_weather['visibility'])],
+        "wind_speed": [float(X_weather['wind_speed'])],
+        "wind_gust": [float(X_weather['wind_gust'])],
         "DayOfWeek": [float(day_of_week)],
         "HourOfDay": [float(hour)],
-        #"Temperature": [float(X_weather['temp'])],
-        "Temperature": [float(20)],
-        "Feels_Like_Temperature": [float(14)],
-        "Altimeter_Pressure": [float(3478)],
-        "Sea_Level_Pressure": [float(1293)],
-        "Visibility": [float(1029)],
-        "Wind_Speed": [float(15)],
-        "Wind_Gust": [float(5)],
-        #must still input precipitation
         "Precipitation": [float(0.0)],
-        #must still input ice accretion
-        #"Ice_Accretion_3hr": [float(0.0)],
         "CarrierAvgDelay": [float(20)],
         "Month": [float(month)]
         })

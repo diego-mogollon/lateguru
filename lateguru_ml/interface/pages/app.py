@@ -7,6 +7,7 @@ import pandas as pd
 from joblib import load
 import numpy as np
 import os
+from lateguru_ml.ml_logic.weather_utils import  get_weather_data, get_lat_lon_cordinates, fahrenheit_to_kelvin
 
 # Model Path - Picking up a specific model from /model
 MODEL_DIR = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'model')
@@ -73,6 +74,11 @@ carrier_picker = st.selectbox('Enter in your airline carrier', carriers)
 date_picker = st.date_input("What is your date of departure?")
 time_picker = st.time_input("What is your scheduled flight departure time?")
 
+lat, lon = get_lat_lon_cordinates(origin_picker)
+
+#dict containing the weather variables from open weather api based on lat and lon coordinates of airport
+X_weather = get_weather_data(lat=lat, lon=lon)
+
 #Prediction action
 if st.button('Predict whether your flight will be delayed'):
        #Convert input into dataframe
@@ -80,24 +86,34 @@ if st.button('Predict whether your flight will be delayed'):
         'Origin': [origin_picker],
         'Dest': [dest_picker],
         'Carrier': [carrier_picker],
-        'DayOfWeek': [date_picker.weekday()],  
-        'HourOfDay': [time_picker.hour],       
-        
+        'DayOfWeek': [date_picker.weekday()],
+        'HourOfDay': [time_picker.hour],
+        'Temperature': [X_weather['temp']],
+        'Feels_Like_Temperature': [X_weather['feels_like_temp']],
+        'Altimeter_Pressure': [X_weather['alt_pressure']],
+        'Sea_Level_Pressure': [X_weather['sl_pressure']],
+        'Visibility': [X_weather['visibility']],
+        'Wind_Speed': [X_weather['wind_speed']],
+        'Wind_Gust': [X_weather['wind_gust']],
+        'Precipitation': [200],
+        'CarrierAvgDelay': [15],
+        'Month': [date_picker.month]
+
         #Placeholders while we get API
-        'Temperature': [70],   
-        'Feels_Like_Temperature': [100], 
-        'Altimeter_Pressure': [30],     
-        'Sea_Level_Pressure': [1012],   
-        'Visibility': [0],             
-        'Wind_Speed': [200],              
-        'Wind_Gust': [200],               
-        'Precipitation': [200],           
-        'CarrierAvgDelay': [15],        
-        'Month': [date_picker.month]    
+        #'Temperature': [70],
+        #'Feels_Like_Temperature': [100],
+        #'Altimeter_Pressure': [30],
+        #'Sea_Level_Pressure': [1012],
+        #'Visibility': [0],
+        #'Wind_Speed': [200],
+        #'Wind_Gust': [200],
+        #'Precipitation': [200],
+        #'CarrierAvgDelay': [15],
+        #'Month': [date_picker.month]
     })
-    
+
     prediction = model.predict(user_input)
-    
+
         # Display result
     if prediction[0] == 1:
         st.write('Your flight is likely to be **delayed**.')

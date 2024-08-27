@@ -32,12 +32,11 @@ X_weather = get_weather_data(lat=lat, lon=lon)
 
 
 #X features
-'''categorical_features = ['Origin', 'Dest', 'Route', 'Carrier']
-numerical_features = [
-    'DayOfWeek', 'HourOfDay', 'Temperature', 'Feels_Like_Temperature',
-    'Altimeter_Pressure', 'Sea_Level_Pressure', 'Visibility',
-    'Wind_Speed', 'Wind_Gust', 'Precipitation', 'Ice_Accretion_3hr',
-    'CarrierAvgDelay', 'Month'
+'''features = [
+    'Origin', 'Dest', 'Carrier', 'DayOfWeek', 'HourOfDay',
+    'Temperature', 'Feels_Like_Temperature', 'Altimeter_Pressure',
+    'Sea_Level_Pressure', 'Visibility', 'Wind_Speed', 'Wind_Gust',
+    'Precipitation', 'CarrierAvgDelay', 'Month'
 ]'''
 
 #coding the predict endpoint function
@@ -69,10 +68,11 @@ def predict_delay(
     to be delayed by weather
     Assumes flight is taking place in the USA"""
 
+
     X_pred = pd.DataFrame({
         "Origin": [str(origin)],
         "Dest": [str(destination)],
-        "Route": [str('LAX_JFK')],
+        #"Route": [str('LAX_JFK')],
         "Carrier": [str(carrier)],
 
         #"delay_len": [float(delay_len)],
@@ -86,7 +86,8 @@ def predict_delay(
 
         "DayOfWeek": [float(day_of_week)],
         "HourOfDay": [float(hour)],
-        "Temperature": [float(X_weather['temp'])],
+        #"Temperature": [float(X_weather['temp'])],
+        "Temperature": [float(20)],
         "Feels_Like_Temperature": [float(14)],
         "Altimeter_Pressure": [float(3478)],
         "Sea_Level_Pressure": [float(1293)],
@@ -96,7 +97,7 @@ def predict_delay(
         #must still input precipitation
         "Precipitation": [float(0.0)],
         #must still input ice accretion
-        "Ice_Accretion_3hr": [float(0.0)],
+        #"Ice_Accretion_3hr": [float(0.0)],
         "CarrierAvgDelay": [float(20)],
         "Month": [float(month)]
         })

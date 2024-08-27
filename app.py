@@ -61,6 +61,26 @@ carriers = ['American Airlines Inc.', 'Alaska Airlines Inc.',
        'Southwest Airlines Co.', 'Endeavor Air Inc.', 'Envoy Air',
        'PSA Airlines Inc.', 'Mesa Airlines Inc.', 'Republic Airline']
 
+avg_carrier_delay = {
+"Alaska Airlines Inc.":12.908908,
+"Allegiant Air.":22.017399,
+"American Airlines Inc.":20.101923,
+"Delta Air Lines Inc.":12.236454,
+"Endeavor Air Inc.":7.980184,
+"Envoy Air":10.305668,
+"Frontier Airlines Inc.":22.357216,
+"Hawaiian Airlines Inc.":12.628407,
+"Horizon Air":8.841963,
+"JetBlue Airways":23.910759,
+"Mesa Airlines Inc.":25.380383,
+"PSA Airlines Inc.":17.002264,
+"Republic Airline":11.582884,
+"SkyWest Airlines Inc.":16.060057,
+"Southwest Airlines Co.":18.943163,
+"Spirit Air Lines ":19.418934,
+"United Air Lines Inc.":17.166492,
+}
+
 #Front end messages
 st.write("""# :zap: :cloud: **Welcome to Lateguru** :airplane:""")
 
@@ -97,12 +117,13 @@ if st.button('Predict whether your flight will be delayed'):
         'Visibility': [X_weather['visibility']],
         'Wind_Speed': [X_weather['wind_speed']],
         'Wind_Gust': [X_weather['wind_gust']],
-        'Precipitation': [200],
-        'CarrierAvgDelay': [15],
+        'Precipitation': [X_weather['rain']],
+        'CarrierAvgDelay': avg_carrier_delay[carriers],
         'Month': [date_picker.month]
 
         #Placeholders while we get API
         #'Temperature': [70],
+
         #'Feels_Like_Temperature': [100],
         #'Altimeter_Pressure': [30],
         #'Sea_Level_Pressure': [1012],

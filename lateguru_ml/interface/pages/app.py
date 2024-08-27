@@ -1,7 +1,23 @@
+#This is the file for streamlit
+
 import streamlit as st
 import datetime
+import streamlit as st
+import pandas as pd
+from joblib import load
+import numpy as np
+import os
 
+# Model Path - Picking up a specific model from /model
+MODEL_DIR = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'model')
+model_path = os.path.join(MODEL_DIR, '20240825_xgb_model_top5.pkl')
+
+#Load trained model
+model = load(model_path)
+
+#Define variables for user input
 origin_airports = ['LAX', 'ATL', 'DEN', 'DFW', 'ORD']
+
 dest_airports = ['JFK', 'HNL', 'DFW', 'CLT', 'KOA', 'PHX', 'OGG', 'ORD', 'MIA',
        'PHL', 'LAS', 'DCA', 'AUS', 'MCO', 'BNA', 'BOS', 'SEA', 'FLL',
        'PDX', 'EWR', 'GEG', 'RSW', 'SFO', 'TPA', 'ANC', 'CHS', 'BUF',
@@ -44,10 +60,8 @@ carriers = ['American Airlines Inc.', 'Alaska Airlines Inc.',
        'Southwest Airlines Co.', 'Endeavor Air Inc.', 'Envoy Air',
        'PSA Airlines Inc.', 'Mesa Airlines Inc.', 'Republic Airline']
 
-
-
+#Front end messages
 st.write("""# :zap: :cloud: **Welcome to Lateguru** :airplane:""")
-
 
 st.write('''### *Predict flight delays so that you can navigate your way to the departure gate without being in a rush*''')
 
@@ -59,9 +73,33 @@ carrier_picker = st.selectbox('Enter in your airline carrier', carriers)
 date_picker = st.date_input("What is your date of departure?")
 time_picker = st.time_input("What is your scheduled flight departure time?")
 
+#Prediction action
 if st.button('Predict whether your flight will be delayed'):
-    print('button clicked!')
-    st.write('Your flight is:')
-
-    #code in logic so that if the prediction result from the model is 1,
-    #then the flight is delayed, otherwise 0 == value of 'not delayed'
+       #Convert input into dataframe
+    user_input = pd.DataFrame({
+        'Origin': [origin_picker],
+        'Dest': [dest_picker],
+        'Carrier': [carrier_picker],
+        'DayOfWeek': [date_picker.weekday()],  
+        'HourOfDay': [time_picker.hour],       
+        
+        #Placeholders while we get API
+        'Temperature': [70],   
+        'Feels_Like_Temperature': [100], 
+        'Altimeter_Pressure': [30],     
+        'Sea_Level_Pressure': [1012],   
+        'Visibility': [0],             
+        'Wind_Speed': [200],              
+        'Wind_Gust': [200],               
+        'Precipitation': [200],           
+        'CarrierAvgDelay': [15],        
+        'Month': [date_picker.month]    
+    })
+    
+    prediction = model.predict(user_input)
+    
+        # Display result
+    if prediction[0] == 1:
+        st.write('Your flight is likely to be **delayed**.')
+    else:
+        st.write('Your flight is likely **not to be delayed**.')

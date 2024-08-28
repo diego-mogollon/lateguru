@@ -99,13 +99,13 @@ def sample_down(X, y, sample_size=0.01, random_state=42):
 def get_features():
     onehot_features = ['Origin', 'Carrier']  # For OneHotEncoder
     target_encoded_feature = ['Dest']        # For TargetEncoder
-    numerical_features = [
+    numeric_features = [
         'DayOfWeek', 'HourOfDay', 'Temperature', 'Feels_Like_Temperature',
         'Altimeter_Pressure', 'Sea_Level_Pressure', 'Visibility',
         'Wind_Speed', 'Wind_Gust', 'Precipitation',
         'CarrierAvgDelay', 'Month'
     ]
-    return onehot_features, target_encoded_feature, numerical_features
+    return onehot_features, target_encoded_feature, numeric_features
 
 #load airport geolocation data
 def load_airport_geo_data(filepath):

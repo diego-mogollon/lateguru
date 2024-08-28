@@ -10,7 +10,15 @@ import os
 #airport = 'LAX'
 
 #reading airports_geolocation_csv
+#dictionary with top 5 airport lat and lons
 
+top_5_airport_coords = {
+    "LAX": {"lat":33.942791, "lon": -118.410042},
+    "ATL": {"lat":33.640411, "lon":-84.419853},
+    "DEN": {"lat":39.849312, "lon":-104.673828},
+    "DFW": {"lat":32.897480, "lon":-97.040443},
+    "ORD": {"lat":41.978611, "lon":-87.904724}
+}
 
 def get_lat_lon_cordinates(airport):
     # script_dir = os.path.dirname(__file__)
@@ -53,6 +61,7 @@ def get_weather_data(lat, lon):
     #handling the fahrenheit feels like temp and converting to kelvin
     kelvin_feels_like_temp = fahrenheit_to_kelvin(json_response['main']['feels_like'])
 
+    #control flow to handle what to set rain to depending if it is in the response
     if json_response.get('rain', None) == None:
 
         weather_dict = {

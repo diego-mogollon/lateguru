@@ -79,7 +79,7 @@ def preprocess_features(X, onehot_features, target_encoded_feature, numeric_feat
 
 '''
 
-Below is a test pipeline by Connor for API. We will end with one pipeline after completing tests and models.
+Below is a test pipeline by Conor for API. We will end with one pipeline after completing tests and models.
 
 '''
 

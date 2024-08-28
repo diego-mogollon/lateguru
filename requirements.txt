@@ -13,3 +13,4 @@ category_encoders
 joblib
 streamlit
 google-cloud-bigquery
+google-cloud-storage

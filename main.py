@@ -15,10 +15,12 @@ from lateguru_ml.ml_logic.data import (
     define_X_and_y,
     split_train_test,
     sample_down,
-    get_features
+    get_features,
+    upload_model_to_gcs
 )
 from lateguru_ml.ml_logic.preprocessor import create_preprocessing_pipeline, preprocess_features
 from lateguru_ml.ml_logic.model import model as xgb_model, fit_model
+from lateguru_ml.params import *
 
 # Define file paths
 DATA_FILE = 'Top_5_Airports.csv'
@@ -30,34 +32,49 @@ def main():
     # Load the preprocessed data
     print("Loading preprocessed data...")
     preprocessed_df = load_preprocessed_data(DATA_FILE, DATA_DIR)
-    
+
+    # or use below for data table from BQ
+    # Define parameters for query
+    # query = f"""
+    #         SELECT *
+    #         FROM `{GCP_PROJECT}.{BQ_DATASET}.{BQ_DATA_TABLE}`
+    #         """
+
+    # #  Get data from local file or BigQuery
+    # preprocessed_df = get_data(
+    #         gcp_project=GCP_PROJECT,
+    #         query=query,
+    #         cache_path=LOCAL_DATA_PATH,
+    #         data_has_header=True
+    #     )
+
     # Ensure the 'Time' column is correctly formatted
     print("Checking and formatting 'Time' column...")
     preprocessed_df = check_time(preprocessed_df)
-    
+
     # Add time-based features and carrier average delay
     print("Adding time-based features and carrier average delay...")
     preprocessed_df = add_data_features(preprocessed_df)
-    
+
     # Verify the DataFrame to ensure all required columns are present
     print("DataFrame columns after adding features:", preprocessed_df.columns.tolist())
-    
+
     # Define X and y
     print("Defining X and y...")
     X, y = define_X_and_y(preprocessed_df)
-    
+
     # Sample down the dataset to 1%
     print("Sampling down the dataset...")
     X_sampled, y_sampled = sample_down(X, y, sample_size=0.01)
-    
+
     # Reset index after sampling
     X_sampled = X_sampled.reset_index(drop=True)
     y_sampled = y_sampled.reset_index(drop=True)
-    
+
     # Split the data into train and test sets
     print("Splitting data into train and test sets...")
     X_train, X_test, y_train, y_test = split_train_test(X_sampled, y_sampled)
-    
+
     # Reset index after splitting
     X_train = X_train.reset_index(drop=True)
     X_test = X_test.reset_index(drop=True)
@@ -71,7 +88,7 @@ def main():
     # Get feature lists for preprocessing
     print("Retrieving feature lists for preprocessing...")
     onehot_features, target_encoded_feature, numeric_features = get_features()
-    
+
     # Create preprocessing pipeline
     print("Creating preprocessing pipeline...")
     preprocessor = create_preprocessing_pipeline(
@@ -81,7 +98,7 @@ def main():
         binary_features=[],  # No binary features
         apply_pca=False  # Adjust if using PCA (not needed for this new data set - may remove PCA function this week)
     )
-    
+
     # Preprocess features - Important: TargetEncoder requires to pass 'y'
     print("Preprocessing features...")
     try:
@@ -91,11 +108,11 @@ def main():
         print(f"Error during preprocessing: {e}")
         print(f"X_train index: {X_train.index}, y_train index: {y_train.index}")
         return
-    
+
     # Train the model
     print("Training the model...")
     model = fit_model(xgb_model, X_train_preprocessed, y_train)
-    
+
     # Evaluate the model
     def evaluate_model(model, X_test, y_test):
         y_pred = model.predict(X_test)
@@ -113,15 +130,22 @@ def main():
 
     print("Evaluating the model...")
     evaluate_model(model, X_test_preprocessed, y_test)
-    
+
     # Save the model to a pkl file
     print("Saving the model to a pkl file...")
     if not os.path.exists(MODEL_DIR):
         os.makedirs(MODEL_DIR)
     dump(model, MODEL_FILE)
-    
+
     print(f"Model saved to {MODEL_FILE}")
-    
+
+    # Upload model pickle file to GCS
+    upload_model_to_gcs(
+        bucket_name=BUCKET_NAME,
+        source_file_name=MODEL_FILE,
+        destination_blob_name="model_training/model.pkl"
+    )
+
     #Set learning curve
     def plot_learning_curve(model, X, y):
         train_sizes, train_scores, validation_scores = learning_curve(
@@ -146,88 +170,10 @@ def main():
         plt.legend(loc='best')
         plt.grid(True)
         plt.show()
-    
+
     # Plot learning curve
     print("Plotting learning curve...")
     plot_learning_curve(model, X_train_preprocessed, y_train)
 
 if __name__ == "__main__":
     main()
-
-
-"""
-
-CODE BY MARK - YET TO BE TESTED
-
-"""
-
-# from pathlib import Path
-# from dateutil.parser import parse
-
-# from lateguru_ml.params import *
-# from lateguru_ml.ml_logic.data import load_preprocessed_data, define_y_and_X, split_train_test, sample_down, get_features, get_data, compress_data, check_time, add_data_features
-# from lateguru_ml.ml_logic.encoders import encode_categorical_features
-# from lateguru_ml.ml_logic.preprocessor import scale_numeric_features, concatenate_features, apply_pca, preprocess_features,
-# from lateguru_ml.ml_logic.model import initialise_xgboost_model, fit_model, predict
-# from lateguru_ml.ml_logic.registry import save_model, load_model
-
-# Download dataset and preprocess before model training
-
-# def preprocess(min_date:str = '2021-01-01 00:00:00', max_date:str = '2023-12-31 00:00:00') -> None:
-
-#     print(Fore.MAGENTA + "\n ⭐️ Use case: preprocess" + Style.RESET_ALL)
-
-#     # Query raw data from BigQuery using `get_data_with_cache`
-#     min_date = parse(min_date).strftime('%Y-%m-%d %H:%M:%S') # e.g '2021-01-01 00:00:00'
-#     max_date = parse(max_date).strftime('%Y-%m-%d %H:%M:%S') # e.g '2023-12-31 00:00:00'
-
-#     query = f"""
-#         SELECT {",".join(COLUMN_NAMES_RAW)}
-#         FROM `{GCP_PROJECT}`.{BQ_DATASET}.FORWW_data_table'
-#         WHERE Time BETWEEN '{min_date}' AND '{max_date}'
-#         ORDER BY Time
-#     """
-
-#     # Retrieve data using `get_data`
-#     data_query_cache_path = Path(LOCAL_DATA_PATH).joinpath("data", f"query_{min_date}_{max_date}.csv")
-#     data_query = get_data(
-#         query=query,
-#         gcp_project=GCP_PROJECT,
-#         cache_path=data_query_cache_path,
-#         data_has_header=True
-#     )
-
-# def train(
-#         min_date:str = '2021-01-01 00:00:00',
-#         max_date:str = '2015-01-01 00:00:00',
-#         split_ratio: float = 0.02, # 0.02 represents ~ 1 month of validation data on a 2009-2015 train set
-#         learning_rate=0.0005,
-#         batch_size = 256,
-#         patience = 2
-#     ) -> float:
-
-#     """
-#     - Download processed data from your BQ table (or from cache if it exists)
-#     - Train on the preprocessed dataset (which should be ordered by date)
-#     - Store training results and model weights
-
-#     Return val_mae as a float
-#     """
-
-#     print(Fore.MAGENTA + "\n⭐️ Use case: train" + Style.RESET_ALL)
-#     print(Fore.BLUE + "\nLoading preprocessed validation data..." + Style.RESET_ALL)
-
-#     min_date = parse(min_date).strftime('%Y-%m-%d') # e.g '2009-01-01'
-#     max_date = parse(max_date).strftime('%Y-%m-%d') # e.g '2009-01-01'
-
-#     # Load processed data using `get_data_with_cache` in chronological order
-#     # Try it out manually on console.cloud.google.com first!
-
-#     # $CHA_BEGIN
-#     # Below, our columns are called ['_0', '_1'....'_66'] on BQ, student's column names may differ
-#     query = f"""
-#         SELECT * EXCEPT(_0)
-#         FROM `{GCP_PROJECT}`.{BQ_DATASET}.
-#         WHERE _0 BETWEEN '{min_date}' AND '{max_date}'
-#         ORDER BY _0 ASC
-#     """

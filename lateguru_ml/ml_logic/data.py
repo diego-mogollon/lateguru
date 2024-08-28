@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from google.cloud import bigquery
+from google.cloud import storage
 from pathlib import Path
 
 from lateguru_ml.params import *
@@ -187,3 +188,24 @@ def load_data_to_bq(
     result = job.result()  # wait for the job to complete
 
     print(f"✅ Data saved to bigquery, with shape {data.shape}")
+
+#  Upload model to Google Cloud Storage
+def upload_model_to_gcs(
+        bucket_name:str,
+        source_file_name:str,
+        destination_blob_name:str
+    ) -> None:
+
+    # Initialize a Google Cloud Storage client
+    client = storage.Client()
+
+    # Access the bucket
+    bucket = client.bucket(bucket_name)
+
+    # Create a new blob in the bucket
+    blob = bucket.blob(destination_blob_name)
+
+    # Upload the local file to the GCS bucket
+    blob.upload_from_filename(source_file_name)
+
+    print(f"Model file {source_file_name} uploaded to {bucket_name}/{destination_blob_name}.")

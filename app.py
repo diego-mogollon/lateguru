@@ -118,7 +118,7 @@ if st.button('Predict whether your flight will be delayed'):
         'Wind_Speed': [X_weather['wind_speed']],
         'Wind_Gust': [X_weather['wind_gust']],
         'Precipitation': [X_weather['rain']],
-        'CarrierAvgDelay': avg_carrier_delay[carrier_picker],
+        'CarrierAvgDelay': [avg_carrier_delay[carrier_picker]],
         'Month': [date_picker.month]
 
         #Placeholders while we get API

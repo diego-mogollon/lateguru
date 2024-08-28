@@ -20,7 +20,7 @@ GAR_MEMORY = os.environ.get("GAR_MEMORY")
 
 ##################  CONSTANTS  #####################
 LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), "lateguru", "data")
-# LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), "lateguru", "training_outputs")
+LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), "lateguru", "model")
 
 COLUMN_NAMES_RAW = ['Time', 'Origin', 'Dest', 'Carrier', 'Cancelled', 'CancellationReason',
        'Delayed', 'DepDelayMinutes', 'CarrierDelay', 'Weather_Delay_Length',

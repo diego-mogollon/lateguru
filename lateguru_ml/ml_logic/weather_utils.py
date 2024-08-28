@@ -21,9 +21,11 @@ top_5_airport_coords = {
 }
 
 def get_lat_lon_cordinates(airport):
-    script_dir = os.path.dirname(__file__)
-    raw_data_path = os.path.join(script_dir, '..', '..', 'raw_data', 'Dataset_A_US2023_Kaggle_Airports_Geolocation.csv')
+    # script_dir = os.path.dirname(__file__)
+    raw_data_path = os.path.abspath('geodata/Dataset_A_US2023_Kaggle_airports_geolocation.csv')
+    # raw_data_path = os.path.join(script_dir, '..', '..', 'geodata', 'Dataset_A_US2023_Kaggle_Airports_Geolocation.csv')
     airport_geo_df = load_airport_geo_data(raw_data_path)
+    
 
     cleaned_airport_geos_df = airport_geo_df[['IATA_CODE', 'LATITUDE', 'LONGITUDE']]\
         .rename(columns={'IATA_CODE': 'airport_acronym',

@@ -4,12 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 from lateguru_ml.params import *
 from lateguru_ml.ml_logic.registry import load_model
-from lateguru_ml.ml_logic.preprocessor import preprocess_features_v2
+from lateguru_ml.ml_logic.preprocessor import preprocess_features_v2, create_preprocessing_pipeline
 from lateguru_ml.ml_logic.model import predict
 from lateguru_ml.ml_logic.weather_utils import get_lat_lon_cordinates, get_weather_data, top_5_airport_coords
+
 import os
 #from lateguru_ml.ml_logic.data import load_airport_geo_data
 from lateguru_ml.params import OW_API_KEY
+import joblib
 
 #how the api request url is looking
 #http://127.0.0.1:8000/predict_delay?origin=LAX&destination=JFK&carrier=American%20Airlines%20Inc.&hour=10&day_of_week=4&month=4
@@ -82,13 +84,13 @@ def predict_delay(
         "Origin": [str(origin)],
         "Dest": [str(destination)],
         "Carrier": [str(carrier)],
-        "temp": [float(X_weather['temp'])],
-        "feels_like_temp": [float(X_weather['feels_like_temp'])],
-        "alt_pressure": [float(X_weather['alt_pressure'])],
-        "sl_pressure": [float(X_weather['sl_pressure'])],
-        "visibility": [float(X_weather['visibility'])],
-        "wind_speed": [float(X_weather['wind_speed'])],
-        "wind_gust": [float(X_weather['wind_gust'])],
+        "Temperature": [float(X_weather['temp'])],
+        "Feels_Like_Temperature": [float(X_weather['feels_like_temp'])],
+        "Altimeter_Pressure": [float(X_weather['alt_pressure'])],
+        "Sea_Level_Pressure": [float(X_weather['sl_pressure'])],
+        "Visibility": [float(X_weather['visibility'])],
+        "Wind_Speed": [float(X_weather['wind_speed'])],
+        "Wind_Gust": [float(X_weather['wind_gust'])],
         "DayOfWeek": [float(day_of_week)],
         "HourOfDay": [float(hour)],
         "Precipitation": [float(X_weather['rain'])],
@@ -96,10 +98,13 @@ def predict_delay(
         "Month": [float(month)]
         })
 
-    model = load_model('model/_model.pkl')
+    model = joblib.load('/Users/conorjohnston/code/diego-mogollon/lateguru/lateguru/model/20240825_xgb_model_top5.pkl')
 
-    X_processed = preprocess_features_v2(X_pred)
+    #X_processed = preprocess_only_features(X_pred, onehot_features,target_encoded_feature, numeric_features)
 
+    #X_processed = preprocess_features_v2(X_pred)
+
+    X_processed = X_pred
 
     y_pred = predict(model, X_processed)
 

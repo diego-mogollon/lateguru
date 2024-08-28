@@ -6,9 +6,9 @@ from lateguru_ml.params import *
 from lateguru_ml.ml_logic.registry import load_model
 from lateguru_ml.ml_logic.preprocessor import preprocess_features_v2
 from lateguru_ml.ml_logic.model import predict
-from lateguru_ml.ml_logic.weather_utils import get_lat_lon_cordinates, get_weather_data, airport
+from lateguru_ml.ml_logic.weather_utils import get_lat_lon_cordinates, get_weather_data, top_5_airport_coords
 import os
-from lateguru_ml.ml_logic.data import load_airport_geo_data
+#from lateguru_ml.ml_logic.data import load_airport_geo_data
 from lateguru_ml.params import OW_API_KEY
 
 #how the api request url is looking
@@ -26,10 +26,25 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-lat, lon = get_lat_lon_cordinates(airport)
-
-X_weather = get_weather_data(lat=lat, lon=lon)
-
+avg_carrier_delay = {
+"Alaska Airlines Inc.":12.908908,
+"Allegiant Air.":22.017399,
+"American Airlines Inc.":20.101923,
+"Delta Air Lines Inc.":12.236454,
+"Endeavor Air Inc.":7.980184,
+"Envoy Air":10.305668,
+"Frontier Airlines Inc.":22.357216,
+"Hawaiian Airlines Inc.":12.628407,
+"Horizon Air":8.841963,
+"JetBlue Airways":23.910759,
+"Mesa Airlines Inc.":25.380383,
+"PSA Airlines Inc.":17.002264,
+"Republic Airline":11.582884,
+"SkyWest Airlines Inc.":16.060057,
+"Southwest Airlines Co.":18.943163,
+"Spirit Air Lines ":19.418934,
+"United Air Lines Inc.":17.166492,
+}
 
 #X features
 '''features = [
@@ -56,6 +71,12 @@ def predict_delay(
     to be delayed by weather
     Assumes flight is taking place in the USA"""
 
+    #lat, lon = get_lat_lon_cordinates(origin)
+
+    lat = top_5_airport_coords[origin]['lat']
+    lon = top_5_airport_coords[origin]['lon']
+
+    X_weather = get_weather_data(lat=lat, lon=lon)
 
     X_pred = pd.DataFrame({
         "Origin": [str(origin)],
@@ -70,12 +91,12 @@ def predict_delay(
         "wind_gust": [float(X_weather['wind_gust'])],
         "DayOfWeek": [float(day_of_week)],
         "HourOfDay": [float(hour)],
-        "Precipitation": [float(0.0)],
-        "CarrierAvgDelay": [float(20)],
+        "Precipitation": [float(X_weather['rain'])],
+        "CarrierAvgDelay": [avg_carrier_delay[carrier]],
         "Month": [float(month)]
         })
 
-    model = load_model('_model.pkl')
+    model = load_model('model/_model.pkl')
 
     X_processed = preprocess_features_v2(X_pred)
 

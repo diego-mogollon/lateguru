@@ -2,6 +2,7 @@ raw_data/
 data/
 .python-version
 .DS_Store
+.yaml
 
 # Ignore all CSV
 *csv

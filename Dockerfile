@@ -19,4 +19,4 @@ COPY setup.py setup.py
 COPY main.py main.py
 COPY test_pipeline.py test_pipeline.py
 
-CMD uvicorn lateguru_ml.api.fast:app --port $PORT
+CMD uvicorn lateguru_ml.api.fast:app

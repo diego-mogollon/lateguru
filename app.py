@@ -8,12 +8,16 @@ from joblib import load
 import numpy as np
 import os
 from lateguru_ml.ml_logic.weather_utils import  get_weather_data, get_lat_lon_cordinates, fahrenheit_to_kelvin
+import requests
 import joblib
 
+
 # Model Path - Picking up a specific model from /model
-# model_path = 'model/20240825_xgb_model_top5.pkl'
+model_path = 'model/xgb_model.pkl'
 
 #Load trained model
+model = load(model_path)
+
 # model = load(model_path)
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'model')
@@ -22,6 +26,7 @@ PREPROCESSOR_FILE = os.path.join(MODEL_DIR, 'preprocessor.pkl')
 
 model = joblib.load(MODEL_FILE)
 preprocessor = joblib.load(PREPROCESSOR_FILE)
+
 
 #Define variables for user input
 origin_airports = ['LAX', 'ATL', 'DEN', 'DFW', 'ORD']
@@ -142,13 +147,38 @@ if st.button('Predict whether your flight will be delayed'):
         #'Month': [date_picker.month]
     })
 
-    X_processed = preprocessor.transform(user_input)
-    # prediction = model.predict(user_input)
-    y_pred = model.predict(X_processed)
-    
+    #will need to refactor this and replace with the docker image when it is created
+    #coding the Fast API predict_delay request and returning response to show in the frontend
 
-        # Display result
-    if y_pred[0] == 1:
+    #url = "http://127.0.0.1:8000/predict_delay?"
+    #https://lateguru-service-41079174788.europe-west1.run.app/predict_delay? // Mark's docker image
+    #"https://lateguru-service-tajtjxqq6a-nw.a.run.app/predict_delay?" // Andrii's docer image
+    url = "https://lateguru-service-41079174788.europe-west1.run.app/predict_delay?"
+    params = {"origin": str(origin_picker), "destination":str(dest_picker), "carrier":str(carrier_picker), "hour":float(time_picker.hour), "day_of_week":float(date_picker.weekday()), "month":float(date_picker.month)}
+    response = requests.get(url, params=params)
+    json_response = response.json()
+
+    prediction = json_response['likely_to_be_delayed']
+    #prediction = model.predict(user_input)
+
+    # Display result if getting pred from FAST API response
+    if prediction == True:
         st.write('Your flight is likely to be **delayed**.')
     else:
-        st.write('Your flight is likely **not to be delayed**.')
+         st.write('Your flight is not likely **to be delayed at this time**.')
+
+
+        # Display result if getting pred direct from local model
+    #if prediction[0] == 1:
+    #    st.write('Your flight is likely to be **delayed**.')
+    #else:
+    #    st.write('Your flight is likely **not going to be delayed at this time**.')
+
+
+    #X_processed = preprocessor.transform(user_input)
+    # prediction = model.predict(user_input)
+    #y_pred = model.predict(X_processed)
+
+
+        # Display result
+    #if y_pred[0] == 1:

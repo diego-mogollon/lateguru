@@ -16,7 +16,7 @@ from lateguru_ml.ml_logic.weather_utils import  get_weather_data, get_lat_lon_co
 #Load trained model
 # model = load(model_path)
 
-MODEL_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'model')
+MODEL_DIR = os.path.join(os.path.dirname(__file__), 'model')
 MODEL_FILE = os.path.join(MODEL_DIR, 'xgb_model.pkl')
 
 model = load(MODEL_FILE)

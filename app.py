@@ -13,7 +13,7 @@ import joblib
 
 
 # Model Path - Picking up a specific model from /model
-model_path = 'model/20240825_xgb_model_top5.pkl'
+model_path = 'model/xgb_model.pkl'
 
 #Load trained model
 model = load(model_path)
@@ -159,8 +159,6 @@ if st.button('Predict whether your flight will be delayed'):
 
     # Display result if getting pred from FAST API response
     if prediction == True:
-
-
         st.write('Your flight is likely to be **delayed**.')
     else:
          st.write('Your flight is not likely **to be delayed at this time**.')

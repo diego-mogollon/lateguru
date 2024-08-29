@@ -9,6 +9,7 @@ import numpy as np
 import os
 from lateguru_ml.ml_logic.weather_utils import  get_weather_data, get_lat_lon_cordinates, fahrenheit_to_kelvin
 import requests
+import joblib
 
 
 # Model Path - Picking up a specific model from /model
@@ -16,6 +17,16 @@ model_path = 'model/20240825_xgb_model_top5.pkl'
 
 #Load trained model
 model = load(model_path)
+
+# model = load(model_path)
+
+MODEL_DIR = os.path.join(os.path.dirname(__file__), 'model')
+MODEL_FILE = os.path.join(MODEL_DIR, 'xgb_model.pkl')
+PREPROCESSOR_FILE = os.path.join(MODEL_DIR, 'preprocessor.pkl')
+
+model = joblib.load(MODEL_FILE)
+preprocessor = joblib.load(PREPROCESSOR_FILE)
+
 
 #Define variables for user input
 origin_airports = ['LAX', 'ATL', 'DEN', 'DFW', 'ORD']
@@ -148,6 +159,8 @@ if st.button('Predict whether your flight will be delayed'):
 
     # Display result if getting pred from FAST API response
     if prediction == True:
+
+
         st.write('Your flight is likely to be **delayed**.')
     else:
          st.write('Your flight is not likely **to be delayed at this time**.')
@@ -158,3 +171,12 @@ if st.button('Predict whether your flight will be delayed'):
     #    st.write('Your flight is likely to be **delayed**.')
     #else:
     #    st.write('Your flight is likely **not going to be delayed at this time**.')
+
+
+    #X_processed = preprocessor.transform(user_input)
+    # prediction = model.predict(user_input)
+    #y_pred = model.predict(X_processed)
+
+
+        # Display result
+    #if y_pred[0] == 1:

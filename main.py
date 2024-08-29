@@ -1,5 +1,7 @@
 #this main.py file will handle all the ml_logic logic, calling main functions from params.py, utils.py, data.py, encoder.py, preprocessor.py, model.py, and registry.py
 
+# this main.py file will handle all the ml_logic logic, calling main functions from params.py, utils.py, data.py, encoder.py, preprocessor.py, model.py, and registry.py
+
 import numpy as np
 import pandas as pd
 import os
@@ -17,7 +19,10 @@ from lateguru_ml.ml_logic.data import (
     sample_down,
     get_features
 )
-from lateguru_ml.ml_logic.preprocessor import create_preprocessing_pipeline, preprocess_features
+from lateguru_ml.ml_logic.preprocessor import (
+    create_preprocessing_pipeline,
+    preprocess_features
+)
 from lateguru_ml.ml_logic.model import model as xgb_model, fit_model
 
 # Define file paths
@@ -51,14 +56,21 @@ def preprocess_data(X, y):
         onehot_features=onehot_features,
         target_encoded_feature=target_encoded_feature,
         numeric_features=numeric_features,
-        binary_features=[],  # No binary features
         apply_pca=False  # Adjust if using PCA
     )
     
-    print("Preprocessing features...")
-    X_preprocessed = preprocessor.fit_transform(X, y)
+    print("Fitting the preprocessor...")
+    preprocessor.fit(X, y)
 
-    return X_preprocessed, preprocessor
+    return preprocessor
+
+def save_preprocessor(preprocessor):
+    """Save the preprocessor to a file."""
+    print("Saving the preprocessor to a pkl file...")
+    if not os.path.exists(MODEL_DIR):
+        os.makedirs(MODEL_DIR)
+    dump(preprocessor, PREPROCESSOR_FILE)
+    print(f"Preprocessor saved to {PREPROCESSOR_FILE}")
 
 def train_and_save_model(X_train_preprocessed, y_train):
     """Train the model and save it to a file."""
@@ -70,12 +82,6 @@ def train_and_save_model(X_train_preprocessed, y_train):
     print(f"Model saved to {MODEL_FILE}")
     
     return model
-
-def save_preprocessor(preprocessor):
-    """Save the preprocessor to a file."""
-    print("Saving the preprocessor to a pkl file...")
-    dump(preprocessor, PREPROCESSOR_FILE)
-    print(f"Preprocessor saved to {PREPROCESSOR_FILE}")
 
 def evaluate_model(model, X_test, y_test):
     """Evaluate the trained model."""
@@ -106,10 +112,10 @@ def plot_learning_curve(model, X, y):
     plt.figure(figsize=(10, 6))
     plt.plot(train_sizes, train_scores_mean, label='Training score', color='blue')
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
-                    train_scores_mean + train_scores_std, alpha=0.2, color='blue')
+                     train_scores_mean + train_scores_std, alpha=0.2, color='blue')
     plt.plot(train_sizes, validation_scores_mean, label='Validation score', color='green')
     plt.fill_between(train_sizes, validation_scores_mean - validation_scores_std,
-                    validation_scores_mean + validation_scores_std, alpha=0.2, color='green')
+                     validation_scores_mean + validation_scores_std, alpha=0.2, color='green')
     plt.title('Learning Curve for Lateguru XGBoost Model')
     plt.xlabel('Training Set Size')
     plt.ylabel('Recall Score')
@@ -118,7 +124,7 @@ def plot_learning_curve(model, X, y):
     plt.show()
 
 def main():
-    """Main function to run the full workflow."""
+    """Main function to run the full flow."""
     # Load and prepare data
     preprocessed_df = load_and_prepare_data()
 
@@ -139,7 +145,9 @@ def main():
     X_train, X_test, y_train, y_test = split_train_test(X_sampled, y_sampled)
     
     # Preprocess data
-    X_train_preprocessed, preprocessor = preprocess_data(X_train, y_train)
+    print("Preprocessing training data...")
+    preprocessor = preprocess_data(X_train, y_train)
+    X_train_preprocessed = preprocessor.transform(X_train)
 
     # Train the model and save it
     model = train_and_save_model(X_train_preprocessed, y_train)
@@ -161,7 +169,7 @@ if __name__ == "__main__":
 
 
 """
-MAIN FUNCTION TESTED AND WORKING - WILL DELETE AFTER REFACTORING FOR FAST.PY AND APP.PY
+OLD 'MAIN' HERE BELOW - WILL DELETE AFTER CONFIMRING FAST.PY WORKS AS EXPECTED AFTER RECENT REFACTORING
 """
 
 

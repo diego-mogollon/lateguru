@@ -150,7 +150,7 @@ if st.button('Predict whether your flight will be delayed'):
     #will need to refactor this and replace with the docker image when it is created
     #coding the Fast API predict_delay request and returning response to show in the frontend
     url = "http://127.0.0.1:8000/predict_delay?"
-    params = {"origin": str(origin_picker), "destination":str(dest_picker), "carrier":str(carrier_picker), "hour":float(time_picker), "day_of_week":float(date_picker.weekday()), "month":float(date_picker.month)}
+    params = {"origin": str(origin_picker), "destination":str(dest_picker), "carrier":str(carrier_picker), "hour":float(time_picker.hour), "day_of_week":float(date_picker.weekday()), "month":float(date_picker.month)}
     response = requests.get(url, params=params)
     json_response = response.json()
 

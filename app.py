@@ -8,18 +8,14 @@ from joblib import load
 import numpy as np
 import os
 from lateguru_ml.ml_logic.weather_utils import  get_weather_data, get_lat_lon_cordinates, fahrenheit_to_kelvin
+import requests
 
 
 # Model Path - Picking up a specific model from /model
-# model_path = 'model/20240825_xgb_model_top5.pkl'
+model_path = 'model/20240825_xgb_model_top5.pkl'
 
 #Load trained model
-# model = load(model_path)
-
-MODEL_DIR = os.path.join(os.path.dirname(__file__), 'model')
-MODEL_FILE = os.path.join(MODEL_DIR, 'xgb_model.pkl')
-
-model = load(MODEL_FILE)
+model = load(model_path)
 
 #Define variables for user input
 origin_airports = ['LAX', 'ATL', 'DEN', 'DFW', 'ORD']
@@ -140,11 +136,25 @@ if st.button('Predict whether your flight will be delayed'):
         #'Month': [date_picker.month]
     })
 
+    #will need to refactor this and replace with the docker image when it is created
+    #coding the Fast API predict_delay request and returning response to show in the frontend
+    url = "http://127.0.0.1:8000/predict_delay?"
+    params = {"origin": str(origin_picker), "destination":str(dest_picker), "carrier":str(carrier_picker), "hour":float(time_picker), "day_of_week":float(date_picker.weekday()), "month":float(date_picker.month)}
+    response = requests.get(url, params=params)
+    json_response = response.json()
 
-    prediction = model.predict(user_input)
+    prediction = json_response['likely_to_be_delayed']
+    #prediction = model.predict(user_input)
 
-        # Display result
-    if prediction[0] == 1:
+    # Display result if getting pred from FAST API response
+    if prediction == True:
         st.write('Your flight is likely to be **delayed**.')
     else:
-        st.write('Your flight is likely **not to be delayed**.')
+         st.write('Your flight is not likely **to be delayed at this time**.')
+
+
+        # Display result if getting pred direct from local model
+    #if prediction[0] == 1:
+    #    st.write('Your flight is likely to be **delayed**.')
+    #else:
+    #    st.write('Your flight is likely **not going to be delayed at this time**.')

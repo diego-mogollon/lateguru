@@ -99,13 +99,13 @@ def sample_down(X, y, sample_size=0.01, random_state=42):
 def get_features():
     onehot_features = ['Origin', 'Carrier']  # For OneHotEncoder
     target_encoded_feature = ['Dest']        # For TargetEncoder
-    numerical_features = [
+    numeric_features = [
         'DayOfWeek', 'HourOfDay', 'Temperature', 'Feels_Like_Temperature',
         'Altimeter_Pressure', 'Sea_Level_Pressure', 'Visibility',
         'Wind_Speed', 'Wind_Gust', 'Precipitation',
         'CarrierAvgDelay', 'Month'
     ]
-    return onehot_features, target_encoded_feature, numerical_features
+    return onehot_features, target_encoded_feature, numeric_features
 
 #load airport geolocation data
 def load_airport_geo_data(filepath):
@@ -126,64 +126,64 @@ def compress_data(df: pd.DataFrame) -> pd.DataFrame:
 
 NOT TESTED - MARK PLEASE CONFIRM WHAT NEEDS TO BE KEPT AND WHAT NEEDS REFACTORING
 
-"""
+# """
 
-#Load data from gcp
-def get_data(
-        gcp_project:str,
-        query:str,
-        cache_path:Path,
-        data_has_header=True
-    ) -> pd.DataFrame:
+# #Load data from gcp
+# def get_data(
+#         gcp_project:str,
+#         query:str,
+#         cache_path:Path,
+#         data_has_header=True
+#     ) -> pd.DataFrame:
 
-    # Checking if cache_path already exists otherwise will download from BigQuery
-    if cache_path.is_file():
-        print(Fore.BLUE + "\nLoad data from local CSV..." + Style.RESET_ALL)
-        df = pd.read_csv(cache_path, header='infer' if data_has_header else None)
-    else:
-        print(Fore.BLUE + "\nLoad data from BigQuery server..." + Style.RESET_ALL)
-        client = bigquery.Client(project=gcp_project)
-        query_job = client.query(query)
-        result = query_job.result()
-        df = result.to_dataframe()
+#     # Checking if cache_path already exists otherwise will download from BigQuery
+#     if cache_path.is_file():
+#         print(Fore.BLUE + "\nLoad data from local CSV..." + Style.RESET_ALL)
+#         df = pd.read_csv(cache_path, header='infer' if data_has_header else None)
+#     else:
+#         print(Fore.BLUE + "\nLoad data from BigQuery server..." + Style.RESET_ALL)
+#         client = bigquery.Client(project=gcp_project)
+#         query_job = client.query(query)
+#         result = query_job.result()
+#         df = result.to_dataframe()
 
-        # Store as CSV if the BQ query returned at least one valid line
-        if df.shape[0] > 1:
-            df.to_csv(cache_path, header=data_has_header, index=False)
+#         # Store as CSV if the BQ query returned at least one valid line
+#         if df.shape[0] > 1:
+#             df.to_csv(cache_path, header=data_has_header, index=False)
 
-    print(f"✅ Data loaded, with shape {df.shape}")
+#     print(f"✅ Data loaded, with shape {df.shape}")
 
-    return df
+#     return df
 
-# Can make a def clean_data(df) function if we have time
+# # Can make a def clean_data(df) function if we have time
 
-# Upload data to BigQuery
-def load_data_to_bq(
-        data: pd.DataFrame,
-        gcp_project:str,
-        bq_dataset:str,
-        table: str,
-        truncate: bool
-    ) -> None:
+# # Upload data to BigQuery
+# def load_data_to_bq(
+#         data: pd.DataFrame,
+#         gcp_project:str,
+#         bq_dataset:str,
+#         table: str,
+#         truncate: bool
+#     ) -> None:
 
-    assert isinstance(data, pd.DataFrame)
-    full_table_name = f"{gcp_project}.{bq_dataset}.{table}"
-    print(Fore.BLUE + f"\nSave data to BigQuery @ {full_table_name}...:" + Style.RESET_ALL)
+#     assert isinstance(data, pd.DataFrame)
+#     full_table_name = f"{gcp_project}.{bq_dataset}.{table}"
+#     print(Fore.BLUE + f"\nSave data to BigQuery @ {full_table_name}...:" + Style.RESET_ALL)
 
-    # Load data onto full_table_name
+#     # Load data onto full_table_name
 
-    data.columns = [f"_{column}" if not str(column)[0].isalpha() and not str(column)[0] == "_" else str(column) for column in data.columns]
+#     data.columns = [f"_{column}" if not str(column)[0].isalpha() and not str(column)[0] == "_" else str(column) for column in data.columns]
 
-    client = bigquery.Client()
+#     client = bigquery.Client()
 
-    # Define write mode and schema
-    write_mode = "WRITE_TRUNCATE" if truncate else "WRITE_APPEND"
-    job_config = bigquery.LoadJobConfig(write_disposition=write_mode)
+#     # Define write mode and schema
+#     write_mode = "WRITE_TRUNCATE" if truncate else "WRITE_APPEND"
+#     job_config = bigquery.LoadJobConfig(write_disposition=write_mode)
 
-    print(f"\n{'Write' if truncate else 'Append'} {full_table_name} ({data.shape[0]} rows)")
+#     print(f"\n{'Write' if truncate else 'Append'} {full_table_name} ({data.shape[0]} rows)")
 
-    # Load data
-    job = client.load_table_from_dataframe(data, full_table_name, job_config=job_config)
-    result = job.result()  # wait for the job to complete
+#     # Load data
+#     job = client.load_table_from_dataframe(data, full_table_name, job_config=job_config)
+#     result = job.result()  # wait for the job to complete
 
-    print(f"✅ Data saved to bigquery, with shape {data.shape}")
+#     print(f"✅ Data saved to bigquery, with shape {data.shape}")

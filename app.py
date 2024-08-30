@@ -2,6 +2,7 @@
 
 import streamlit as st
 import datetime
+import time
 import streamlit as st
 import pandas as pd
 from joblib import load
@@ -115,6 +116,14 @@ X_weather = get_weather_data(lat=lat, lon=lon)
 
 #Prediction action
 if st.button('Predict whether your flight will be delayed'):
+
+    progress_text = "Predicting flight delay likelihood"
+    my_bar = st.progress(0, text=progress_text)
+
+    for percent_complete in range(100):
+        time.sleep(0.05)
+        my_bar.progress(percent_complete + 1, text=progress_text)
+
        #Convert input into dataframe
     user_input = pd.DataFrame({
         'Origin': [origin_picker],
@@ -166,6 +175,7 @@ if st.button('Predict whether your flight will be delayed'):
         st.write('Your flight is likely to be **delayed**.')
     else:
          st.write('Your flight is not likely **to be delayed at this time**.')
+
 
 
         # Display result if getting pred direct from local model
